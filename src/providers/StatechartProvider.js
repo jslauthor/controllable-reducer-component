@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import invariant from "fbjs/lib/invariant";
 import warning from "fbjs/lib/warning";
 import { Machine } from "xstate";
+import { callFn } from "../utils/FunctionUtils";
 
 // Statecharts provide a clean separation of concerns: behavior vs internal state
 // TODO: Why can't we generate a state map that has tuples for _every_ potential to/from state combo and a function that maps to it
@@ -25,9 +26,10 @@ class StatechartProvider extends React.Component {
     super(props);
     this.machine = Machine(props.chart);
     this.logic = props.logic || {};
+    // Run the logic on the initial state and capture resulting data
     this.state = {
       ...reduceLogic(this.machine)(this.machine.initialState)({})(
-        this.props.initialState || {}
+        this.props.initialChartState || {}
       )(this.logic),
       machineState: this.machine.initialState
     };
@@ -48,7 +50,8 @@ class StatechartProvider extends React.Component {
   };
 
   send = command => payload => {
-    this.setState(this.transition(command)(payload));
+    const newState = this.transition(command)(payload);
+    this.setState(newState, () => callFn(this.props.onMachineChange)(newState));
   };
 
   render() {
@@ -62,7 +65,9 @@ class StatechartProvider extends React.Component {
 
 StatechartProvider.propTypes = {
   chart: PropTypes.object.isRequired,
-  logic: PropTypes.object.isRequired
+  logic: PropTypes.object.isRequired,
+  initialChartState: PropTypes.object,
+  onMachineChange: PropTypes.func
 };
 
 export default StatechartProvider;
