@@ -69,8 +69,7 @@ const invariantForControlChange = (prevState = {}, nextProps = {}, key) => {
   if (prevState[key]) {
     warning(
       nextProps[key] !== undefined,
-      `Once controlled, a component must remain controlled.
-            The following value was under control, but now is no longer: ${key}`
+      `A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`
     );
   }
 };
@@ -89,6 +88,8 @@ const callFn = (fn = null) => (...args) => {
 // TODO: Write tests for this
 // TODO: Write docs for this
 // TODO: Add isControlled to metadata in action for reducer
+
+const controlledPropsFlags = new Set();
 
 class ControllableReducer extends React.Component {
   state;
@@ -111,10 +112,16 @@ class ControllableReducer extends React.Component {
     isControlled: this.isControlled(getControlledProps(props))
   }));
 
-  static getDerivedStateFromProps = (nextProps, prevState = {}) => {
+  static getDerivedStateFromProps = (nextProps, prevState) => {
     const derivedState = getControlledProps(nextProps).reduce((state, key) => {
-      invariantForControlChange(prevState, nextProps, key);
-      if (prevState[key] !== nextProps[key] && nextProps[key] !== undefined) {
+      if (nextProps[key] !== undefined) {
+        controlledPropsFlags.add(key);
+      }
+      const keyIsControlled = controlledPropsFlags.has(key);
+      if (keyIsControlled) {
+        invariantForControlChange(prevState, nextProps, key);
+      }
+      if (prevState[key] !== nextProps[key] && keyIsControlled) {
         prevState[key] = nextProps[key];
         return prevState;
       }

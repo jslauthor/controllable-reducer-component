@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import styled from "styled-components";
 import ControllableReducerProvider from "../providers/ControllableReducerProvider";
 
+// This is a Temperature Converter component as found in the 7 GUIs challenge: http://eugenkiss.github.io/7guis/tasks/
+
 // Define styled components that will compose into Temperature Converter
 
 const Container = styled.section`
@@ -11,6 +13,9 @@ const Container = styled.section`
   background: #333;
   padding: 10px;
   color: white;
+  border-radius: 3px;
+  max-width: 300px;
+  margin: 20px;
 
   input {
     max-width: 50px;
@@ -49,9 +54,15 @@ const fahrenheitInputChanged = event => {
 
 // The reducer used to manage the internal and external state with the component
 
-const reducer = (state = { celciusValue: 0, fahrenheitValue: 0 }, action) => {
-  console.log(state);
+const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
   switch (action.type) {
+    case "INIT": {
+      const { fahrenheitValue, celciusValue } = state;
+      return {
+        celciusValue,
+        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
     case CELCIUS_INPUT_CHANGED: {
       const { fahrenheitValue } = state;
       const celciusValue = action.payload;
@@ -77,6 +88,8 @@ const reducer = (state = { celciusValue: 0, fahrenheitValue: 0 }, action) => {
 // Define which props are "controllable"
 
 const controlledProps = ["celciusValue", "fahrenheitValue"];
+
+// Compose ControllableReducerProvider, Container, and inputs
 
 class TemperatureConverter extends React.Component {
   render() {
