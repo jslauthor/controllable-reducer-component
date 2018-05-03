@@ -9,11 +9,12 @@ import { callFn } from "../utils/FunctionUtils";
 // TODO: Why can't we generate a state map that has tuples for _every_ potential to/from state combo and a function that maps to it
 // Then use a pattern matched ReasonML disjointed Union to create updaters for each?
 
+// OMG the currying 😬
 const reduceLogic = machine => machineState => payload => state => logic =>
   machineState.actions.reduce((state, commandKey) => {
     return {
       ...state,
-      ...logic[commandKey](state, payload)
+      ...callFn(logic[commandKey])(state, payload)
     };
   }, state);
 

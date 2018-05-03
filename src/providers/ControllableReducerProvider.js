@@ -52,7 +52,7 @@ const invariantForMissingAndDefaultProps = weakMemo(props => state => {
       }
       return acc;
     },
-    [[], []]
+    [[], []] // Pair? lol
   );
 
   // Display warning if a controlled prop is supplied with a default value
@@ -91,11 +91,11 @@ const callFn = (fn = null) => (...args) => {
 // TODO: Add isControlled to metadata in action for reducer
 
 class ControllableReducer extends React.Component {
-  state = {};
+  state;
 
   constructor(props) {
     super(props);
-    this.state = props.initialState || state;
+    this.state = this.props.reducer(this.props.initialState, { type: "INIT" });
   }
 
   isControlled = weakMemo(controlledProps =>
@@ -111,11 +111,10 @@ class ControllableReducer extends React.Component {
     isControlled: this.isControlled(getControlledProps(props))
   }));
 
-  static getDerivedStateFromProps = (nextProps, prevState) => {
-    console.log(nextProps);
+  static getDerivedStateFromProps = (nextProps, prevState = {}) => {
     const derivedState = getControlledProps(nextProps).reduce((state, key) => {
       invariantForControlChange(prevState, nextProps, key);
-      if (prevState[key] !== nextProps[key]) {
+      if (prevState[key] !== nextProps[key] && nextProps[key] !== undefined) {
         prevState[key] = nextProps[key];
         return prevState;
       }
@@ -136,7 +135,7 @@ class ControllableReducer extends React.Component {
     // change handlers if a change occurred
     this.setState(this.props.reducer(this.state, action), () => {
       // TODO: Check if previous state is same as new state and abort here
-      getControlledProps(nextProps).forEach(key => {
+      getControlledProps(this.props).forEach(key => {
         if (this.props[key] !== this.state[key]) {
           callFn(this.props[getChangeHandler(key)])(this.state);
         }
@@ -153,6 +152,8 @@ class ControllableReducer extends React.Component {
     });
   }
 }
+
+ControllableReducer.displayName = "ControllableReducer";
 
 ControllableReducer.propTypes = {
   controlledProps: PropTypes.array.isRequired,

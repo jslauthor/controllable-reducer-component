@@ -1,3 +1,6 @@
+const True = { "@webflow/Boolean": true };
+const False = { "@webflow/Boolean": false };
+
 export const weakMemo = fn => {
   const map = new WeakMap();
   const memFn = arg => {
