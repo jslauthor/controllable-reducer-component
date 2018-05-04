@@ -16,8 +16,10 @@ const Container = styled.section`
   border-radius: 3px;
   max-width: 300px;
   margin: 20px;
-
-  input {
+  border: ${({ wrongResult }) => (wrongResult ? "1px solid red;" : "none;")}
+    /** 
+  * Wow prettier sucks
+  */ input {
     max-width: 50px;
   }
 
@@ -26,14 +28,16 @@ const Container = styled.section`
   }
 `;
 
-// Some utility methods
+// Some utility methods [can be included in another file]
 
 const convertCelsiusToFahrenheit = celcius => Number(celcius) * (9 / 5) + 32;
 const convertFahrenheitToCelsius = fahrenheit =>
   (Number(fahrenheit) - 32) * (5 / 9);
 const makeHandler = dispatch => action => event => dispatch(action(event));
+const isConversionCorrect = (celcius, fahrenheit) =>
+  fahrenheit === convertCelsiusToFahrenheit(celcius);
 
-// Create the actions for the reducer
+// Create the actions for the reducer [can be included in another file]
 
 const CELCIUS_INPUT_CHANGED = "CELCIUS_INPUT_CHANGED";
 const FAHRENHEIT_INPUT_CHANGED = "FAHRENHEIT_INPUT_CHANGED";
@@ -53,6 +57,7 @@ const fahrenheitInputChanged = event => {
 };
 
 // The reducer used to manage the internal and external state with the component
+// [can be included in another file]
 
 const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
   switch (action.type) {
@@ -97,9 +102,7 @@ class TemperatureConverter extends React.Component {
       <ControllableReducerProvider
         reducer={reducer}
         controlledProps={controlledProps}
-        initialState={this.props.initialState}
-        celciusValue={this.props.celciusValue}
-        fahrenheitValue={this.props.fahrenheitValue}
+        {...this.props}
       >
         {({
           dispatch,
@@ -108,7 +111,9 @@ class TemperatureConverter extends React.Component {
           fahrenheitValue,
           defaultFahrenheitValue
         }) => (
-          <Container>
+          <Container
+            wrongResult={!isConversionCorrect(celciusValue, fahrenheitValue)}
+          >
             <input
               value={celciusValue}
               defaultValue={defaultCelciusValue}

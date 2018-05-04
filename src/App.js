@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import styled from "styled-components";
-import StateChartExample from "./components/StateChartExample";
+import TemperatureConverterExample from "./components/TemperatureConverterExample";
 
 class App extends Component {
   render() {
-    return <StateChartExample />;
+    return <TemperatureConverterExample />;
   }
 }
 

@@ -17,24 +17,59 @@ const {
   MISSING_HANDLER_ERROR
 } = stateObj;
 
+class TemperatureConverterControlled extends React.Component {
+  state = {
+    celciusValue: 55,
+    fahrenheitValue: 200
+  };
+
+  onCelciusChange = celcius => {
+    console.log("celcius", celcius);
+    this.setState({ celciusValue: celcius });
+  };
+
+  onFahrenheitChange = fahrenheit => {
+    console.log("fahrenheit", fahrenheit);
+    this.setState({ fahrenheitValue: fahrenheit });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+        fahrenheitValue={this.state.fahrenheitValue}
+        onFahrenheitValueChange={this.onFahrenheitChange}
+      />
+    );
+  }
+}
+
 const getComponentForState = state => {
   switch (state) {
     case AUTONOMOUS:
       return <TemperatureConverter />;
+    case CONTROLLED:
+      return <TemperatureConverterControlled />;
+    case DEFAULT_VALUE:
+      return (
+        <TemperatureConverter
+          defaultCelciusValue={55}
+          defaultFahrenheitValue={200}
+        />
+      );
+    case MISSING_HANDLER_ERROR:
+      return <TemperatureConverter celciusValue={55} fahrenheitValue={200} />;
   }
 };
 
 /**
  * We'll use David K's xstate library to control the visual states
- * Expect a future RFC detailing this 🙋
+ * Expect a future RFC that details this 🙋
  */
 
 const ControlledReducerExampleContainer = props => (
-  <StatechartProvider
-    chart={chart}
-    logic={logic}
-    onMachineChange={logMachineChange}
-  >
+  <StatechartProvider chart={chart} logic={logic}>
     {({ send, machineState }) => {
       return (
         <div>
