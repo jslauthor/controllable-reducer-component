@@ -137,7 +137,6 @@ class ControllableReducer extends React.Component {
     this.setState(
       { reducerState: this.props.reducer(this.state.reducerState, action) },
       () => {
-        // TODO: Check if previous state is same as new state and abort here
         getControlledProps(this.props).forEach(key => {
           if (
             this.props[key] !== this.state.reducerState[key] &&

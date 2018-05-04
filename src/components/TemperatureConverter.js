@@ -71,6 +71,8 @@ const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
     case CELCIUS_INPUT_CHANGED: {
       const { fahrenheitValue } = state;
       const celciusValue = action.payload;
+      // Here we check if a particular prop is under the control of the parent. 
+      // If it is, we don't change the value
       const { controlledProps } = action.metadata;
       return {
         celciusValue,

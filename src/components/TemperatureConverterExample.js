@@ -11,31 +11,31 @@ import TemperatureConverter from "./TemperatureConverter";
 
 const {
   AUTONOMOUS,
-  CONTROLLED,
+  FULLY_CONTROLLED,
+  PARTIALLY_CONTROLLED,
   DEFAULT_VALUE,
   DEFAULT_VALUE_ERROR,
   MISSING_HANDLER_ERROR
 } = stateObj;
 
-class TemperatureConverterControlled extends React.Component {
+class FullyControlledTemperatureConverter extends React.Component {
   state = {
     celciusValue: 55,
     fahrenheitValue: 200
   };
 
   onCelciusChange = celcius => {
-    console.log("celcius", celcius);
     this.setState({ celciusValue: celcius });
   };
 
   onFahrenheitChange = fahrenheit => {
-    console.log("fahrenheit", fahrenheit);
     this.setState({ fahrenheitValue: fahrenheit });
   };
 
   render() {
     return (
       <TemperatureConverter
+        initialState={this.state}
         celciusValue={this.state.celciusValue}
         onCelciusValueChange={this.onCelciusChange}
         fahrenheitValue={this.state.fahrenheitValue}
@@ -45,12 +45,34 @@ class TemperatureConverterControlled extends React.Component {
   }
 }
 
+class PartiallyControlledTemperatureConverter extends React.Component {
+  state = {
+    celciusValue: 55
+  };
+
+  onCelciusChange = celcius => {
+    this.setState({ celciusValue: celcius });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        initialState={this.state}
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+      />
+    );
+  }
+}
+
 const getComponentForState = state => {
   switch (state) {
     case AUTONOMOUS:
       return <TemperatureConverter />;
-    case CONTROLLED:
-      return <TemperatureConverterControlled />;
+    case FULLY_CONTROLLED:
+      return <FullyControlledTemperatureConverter />;
+    case PARTIALLY_CONTROLLED:
+      return <PartiallyControlledTemperatureConverter />;
     case DEFAULT_VALUE:
       return (
         <TemperatureConverter
@@ -80,8 +102,11 @@ const ControlledReducerExampleContainer = props => (
             <button onClick={makeHandler(send)(AUTONOMOUS)}>
               {AUTONOMOUS}
             </button>
-            <button onClick={makeHandler(send)(CONTROLLED)}>
-              {CONTROLLED}
+            <button onClick={makeHandler(send)(PARTIALLY_CONTROLLED)}>
+              {PARTIALLY_CONTROLLED}
+            </button>
+            <button onClick={makeHandler(send)(FULLY_CONTROLLED)}>
+              {FULLY_CONTROLLED}
             </button>
             <button onClick={makeHandler(send)(DEFAULT_VALUE)}>
               {DEFAULT_VALUE}
