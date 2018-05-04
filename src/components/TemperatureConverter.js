@@ -71,16 +71,22 @@ const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
     case CELCIUS_INPUT_CHANGED: {
       const { fahrenheitValue } = state;
       const celciusValue = action.payload;
+      const { controlledProps } = action.metadata;
       return {
         celciusValue,
-        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
+        fahrenheitValue: controlledProps.includes("fahrenheitValue")
+          ? fahrenheitValue
+          : convertCelsiusToFahrenheit(celciusValue)
       };
     }
     case FAHRENHEIT_INPUT_CHANGED: {
       const { celciusValue } = state;
       const fahrenheitValue = action.payload;
+      const { controlledProps } = action.metadata;
       return {
-        celciusValue: convertFahrenheitToCelsius(fahrenheitValue),
+        celciusValue: controlledProps.includes("celciusValue")
+          ? celciusValue
+          : convertFahrenheitToCelsius(fahrenheitValue),
         fahrenheitValue
       };
     }

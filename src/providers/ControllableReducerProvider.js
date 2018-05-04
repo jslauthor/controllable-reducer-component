@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import invariant from "fbjs/lib/invariant";
 import warning from "fbjs/lib/warning";
 import { weakMemo } from "../utils/MemoizationUtils";
+import { callFn } from "../utils/FunctionUtils";
 
 const arr = [];
 const titleCase = str => str.charAt(0).toUpperCase() + str.substr(1);
@@ -78,12 +79,6 @@ const getSafeValue = weakMemo(value => (Array.isArray(value) && value) || arr);
 const getControlledProps = weakMemo(({ controlledProps } = {}) =>
   getSafeValue(controlledProps)
 );
-
-const noop = () => {};
-// Call a function if it exists
-const callFn = (fn = null) => (...args) => {
-  fn ? fn(...args) : noop;
-};
 
 const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
   const controlledProps = Array.from(controlledPropsFlags);
