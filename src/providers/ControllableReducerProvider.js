@@ -85,77 +85,84 @@ const callFn = (fn = null) => (...args) => {
   fn ? fn(...args) : noop;
 };
 
+const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
+  const controlledProps = Array.from(controlledPropsFlags);
+  return {
+    controlledProps,
+    isControlled: controlledProps.length > 0
+  };
+});
+
 // TODO: Write tests for this
 // TODO: Write docs for this
-// TODO: Add isControlled to metadata in action for reducer
-
-const controlledPropsFlags = new Set();
 
 class ControllableReducer extends React.Component {
-  state;
+  state = {
+    reducerState: {},
+    controlledPropsFlags: new Set()
+  };
 
   constructor(props) {
     super(props);
-    this.state = this.props.reducer(this.props.initialState, { type: "INIT" });
+    this.state.reducerState = this.props.reducer(this.props.initialState, {
+      type: "INIT"
+    });
   }
-
-  isControlled = weakMemo(controlledProps =>
-    controlledProps.some(prop => this.state[prop] !== undefined)
-  );
-
-  getControlledPropsInUse = weakMemo(controlledProps =>
-    controlledProps.filter(prop => this.state[prop])
-  );
-
-  getControlledMetadata = weakMemo(props => ({
-    controlledProps: this.getControlledPropsInUse(getControlledProps(props)),
-    isControlled: this.isControlled(getControlledProps(props))
-  }));
 
   static getDerivedStateFromProps = (nextProps, prevState) => {
     const derivedState = getControlledProps(nextProps).reduce((state, key) => {
+      // Controllers of controlled components should never relinquish control
       if (nextProps[key] !== undefined) {
-        controlledPropsFlags.add(key);
+        state.controlledPropsFlags = prevState.controlledPropsFlags.add(key);
       }
-      const keyIsControlled = controlledPropsFlags.has(key);
+      const keyIsControlled = state.controlledPropsFlags.has(key);
       if (keyIsControlled) {
-        invariantForControlChange(prevState, nextProps, key);
+        // Throw warning if parent relinquishes control of any property
+        invariantForControlChange(prevState.reducerState, nextProps, key);
       }
-      if (prevState[key] !== nextProps[key] && keyIsControlled) {
-        prevState[key] = nextProps[key];
-        return prevState;
+      // Assign incoming property to internal state
+      if (prevState.reducerState[key] !== nextProps[key] && keyIsControlled) {
+        state.reducerState = { ...state.reducerState, [key]: nextProps[key] };
       }
       return state;
-    }, null);
+    }, prevState);
     if (nextProps != null) {
       invariantForMissingAndDefaultProps(nextProps)(derivedState);
     }
-    return derivedState;
+    return derivedState !== prevState ? derivedState : null;
   };
 
   dispatch = action => {
     action.metadata = {
       ...action.metadata,
-      ...this.getControlledMetadata(this.props)
+      ...getControlledMetadata(this.state)
     };
     // This updates the state using the reducer and calls all controlled
     // change handlers if a change occurred
-    this.setState(this.props.reducer(this.state, action), () => {
-      // TODO: Check if previous state is same as new state and abort here
-      getControlledProps(this.props).forEach(key => {
-        if (this.props[key] !== this.state[key]) {
-          callFn(this.props[getChangeHandler(key)])(this.state);
-        }
-      });
-    });
+    this.setState(
+      { reducerState: this.props.reducer(this.state.reducerState, action) },
+      () => {
+        // TODO: Check if previous state is same as new state and abort here
+        getControlledProps(this.props).forEach(key => {
+          if (
+            this.props[key] !== this.state.reducerState[key] &&
+            this.state.controlledPropsFlags.has(key)
+          ) {
+            callFn(this.props[getChangeHandler(key)])(
+              this.state.reducerState[key]
+            );
+          }
+        });
+      }
+    );
   };
 
   render() {
     return this.props.children({
       dispatch: this.dispatch,
       ...this.props,
-      ...this.state,
-      ...this.getControlledMetadata(this.props)
+      ...this.state.reducerState,
+      ...getControlledMetadata(this.state)
     });
   }
 }
