@@ -22,16 +22,16 @@ const sentenceJoin = arr =>
     ""
   );
 
-const invariantForMissingAndDefaultProps = weakMemo(props => state => {
+const invariantForMissingAndDefaultProps = weakMemo(props => ({controlledPropsFlags}) => {
   const controlledProps = getControlledProps(props);
   // TODO: Only fire for dev here __DEV__ here
-  if (controlledProps.length === 0 || state === null) {
+  if (controlledProps.length === 0 || controlledPropsFlags.size === 0) {
     return;
   }
 
   const missingHandlers = controlledProps.reduce((acc, prop) => {
     const handlerProp = getChangeHandler(prop);
-    if (state[prop] !== undefined && props[handlerProp] === undefined) {
+    if (controlledPropsFlags.has(prop) && props[handlerProp] === undefined) {
       acc.push(handlerProp);
     }
     return acc;
@@ -47,7 +47,7 @@ const invariantForMissingAndDefaultProps = weakMemo(props => state => {
   const conflictingDefaults = controlledProps.reduce(
     (acc, prop) => {
       const defaultProp = getDefaultName(prop);
-      if (state[prop] !== undefined && props[defaultProp] !== undefined) {
+      if (controlledPropsFlags.has(prop) && props[defaultProp] !== undefined) {
         acc[0].push(prop);
         acc[1].push(defaultProp);
       }
@@ -108,15 +108,15 @@ class ControllableReducer extends React.Component {
     const derivedState = getControlledProps(nextProps).reduce((state, key) => {
       // Controllers of controlled components should never relinquish control
       if (nextProps[key] !== undefined) {
-        state.controlledPropsFlags = prevState.controlledPropsFlags.add(key);
+        state.controlledPropsFlags = state.controlledPropsFlags.add(key);
       }
       const keyIsControlled = state.controlledPropsFlags.has(key);
       if (keyIsControlled) {
         // Throw warning if parent relinquishes control of any property
-        invariantForControlChange(prevState.reducerState, nextProps, key);
+        invariantForControlChange(state.reducerState, nextProps, key);
       }
       // Assign incoming property to internal state
-      if (prevState.reducerState[key] !== nextProps[key] && keyIsControlled) {
+      if (state.reducerState[key] !== nextProps[key] && keyIsControlled) {
         state.reducerState = { ...state.reducerState, [key]: nextProps[key] };
       }
       return state;
@@ -124,7 +124,7 @@ class ControllableReducer extends React.Component {
     if (nextProps != null) {
       invariantForMissingAndDefaultProps(nextProps)(derivedState);
     }
-    return derivedState !== prevState ? derivedState : null;
+    return derivedState;
   };
 
   dispatch = action => {
@@ -152,6 +152,12 @@ class ControllableReducer extends React.Component {
   };
 
   render() {
+    console.log({
+      dispatch: this.dispatch,
+      ...this.props,
+      ...this.state.reducerState,
+      ...getControlledMetadata(this.state)
+    })
     return this.props.children({
       dispatch: this.dispatch,
       ...this.props,
