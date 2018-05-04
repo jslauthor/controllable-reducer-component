@@ -22,49 +22,54 @@ const sentenceJoin = arr =>
     ""
   );
 
-const invariantForMissingAndDefaultProps = weakMemo(props => ({controlledPropsFlags}) => {
-  const controlledProps = getControlledProps(props);
-  // TODO: Only fire for dev here __DEV__ here
-  if (controlledProps.length === 0 || controlledPropsFlags.size === 0) {
-    return;
-  }
-
-  const missingHandlers = controlledProps.reduce((acc, prop) => {
-    const handlerProp = getChangeHandler(prop);
-    if (controlledPropsFlags.has(prop) && props[handlerProp] === undefined) {
-      acc.push(handlerProp);
+const invariantForMissingAndDefaultProps = weakMemo(
+  props => ({ controlledPropsFlags }) => {
+    const controlledProps = getControlledProps(props);
+    // TODO: Only fire for dev here __DEV__ here
+    if (controlledProps.length === 0 || controlledPropsFlags.size === 0) {
+      return;
     }
-    return acc;
-  }, []);
 
-  // Display warning if a controlled prop is supplied without an onChange handler
-  warning(
-    missingHandlers.length === 0,
-    `To take control over this component,` + ` Controllable requires %s!`,
-    sentenceJoin(missingHandlers)
-  );
-
-  const conflictingDefaults = controlledProps.reduce(
-    (acc, prop) => {
-      const defaultProp = getDefaultName(prop);
-      if (controlledPropsFlags.has(prop) && props[defaultProp] !== undefined) {
-        acc[0].push(prop);
-        acc[1].push(defaultProp);
+    const missingHandlers = controlledProps.reduce((acc, prop) => {
+      const handlerProp = getChangeHandler(prop);
+      if (controlledPropsFlags.has(prop) && props[handlerProp] === undefined) {
+        acc.push(handlerProp);
       }
       return acc;
-    },
-    [[], []] // Pair? lol
-  );
+    }, []);
 
-  // Display warning if a controlled prop is supplied with a default value
-  warning(
-    conflictingDefaults[0].length === 0,
-    `Controllable components require a controlled prop or a default prop, but not both.` +
-      ` Select either %s, or %s for this component!`,
-    sentenceJoin(conflictingDefaults[0]),
-    sentenceJoin(conflictingDefaults[1])
-  );
-});
+    // Display warning if a controlled prop is supplied without an onChange handler
+    warning(
+      missingHandlers.length === 0,
+      `To take control over this component,` + ` Controllable requires %s!`,
+      sentenceJoin(missingHandlers)
+    );
+
+    const conflictingDefaults = controlledProps.reduce(
+      (acc, prop) => {
+        const defaultProp = getDefaultName(prop);
+        if (
+          controlledPropsFlags.has(prop) &&
+          props[defaultProp] !== undefined
+        ) {
+          acc[0].push(prop);
+          acc[1].push(defaultProp);
+        }
+        return acc;
+      },
+      [[], []] // Pair? lol
+    );
+
+    // Display warning if a controlled prop is supplied with a default value
+    warning(
+      conflictingDefaults[0].length === 0,
+      `Controllable components require a controlled prop or a default prop, but not both.` +
+        ` Select either %s, or %s for this component!`,
+      sentenceJoin(conflictingDefaults[0]),
+      sentenceJoin(conflictingDefaults[1])
+    );
+  }
+);
 
 const invariantForControlChange = (prevState = {}, nextProps = {}, key) => {
   if (prevState[key]) {
@@ -87,6 +92,21 @@ const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
     isControlled: controlledProps.length > 0
   };
 });
+
+// If we have a default value and the reducer supplied default state, we must delete it for components
+// like <input /> that don't also follow the rule of "no value allowed if there is a default value"
+
+const getReducedState = (state) => {
+  const reducedState = Object.assign({}, state);
+  getControlledProps(state).forEach(key => {
+    const changeHandlerName = getChangeHandler(key);
+    if ( reducedState[getDefaultName(key)]) {
+      delete reducedState[key];
+      delete reducedState[changeHandlerName];
+    }
+  });
+  return reducedState;
+};
 
 // TODO: Write tests for this
 // TODO: Write docs for this
@@ -137,31 +157,22 @@ class ControllableReducer extends React.Component {
     this.setState(
       { reducerState: this.props.reducer(this.state.reducerState, action) },
       () => {
-        getControlledProps(this.props).forEach(key => {
-          if (
-            this.props[key] !== this.state.reducerState[key] &&
-            this.state.controlledPropsFlags.has(key)
-          ) {
+        this.state.controlledPropsFlags.forEach(key => {
+          this.props[key] !== this.state.reducerState[key] &&
             callFn(this.props[getChangeHandler(key)])(
               this.state.reducerState[key]
             );
-          }
         });
       }
     );
   };
 
   render() {
-    console.log({
-      dispatch: this.dispatch,
-      ...this.props,
-      ...this.state.reducerState,
-      ...getControlledMetadata(this.state)
-    })
+    // console.log(getReducedState({...this.props, ...this.state.reducerState}));
+    // Yes, this creates a new object each time. Need to revisit this.
     return this.props.children({
       dispatch: this.dispatch,
-      ...this.props,
-      ...this.state.reducerState,
+      ...getReducedState({...this.props, ...this.state.reducerState}),
       ...getControlledMetadata(this.state)
     });
   }
