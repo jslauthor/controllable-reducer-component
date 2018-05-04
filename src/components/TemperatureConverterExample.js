@@ -18,6 +18,16 @@ const {
   MISSING_HANDLER_ERROR
 } = stateObj;
 
+const StyledButton = styled.span`
+  background-color: ${({ selected }) => (selected ? "#444" : "#AAA")};
+  color: ${({ selected }) => (selected ? "#FFF" : "#000")};
+  padding: 5px;
+  margin: 1px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 3px;
+`;
+
 class FullyControlledTemperatureConverter extends React.Component {
   state = {
     celciusValue: 55,
@@ -77,7 +87,7 @@ const getComponentForState = state => {
       return (
         <TemperatureConverter
           defaultCelciusValue={55}
-          defaultFahrenheitValue={200}
+          defaultFahrenheitValue={131}
         />
       );
     case MISSING_HANDLER_ERROR:
@@ -85,10 +95,8 @@ const getComponentForState = state => {
   }
 };
 
-/**
- * We'll use David K's xstate library to control the visual states
- * Expect a future RFC that details this 🙋
- */
+// We'll use David K's xstate library to control the visual states
+// Expect a future RFC that details this 🙋
 
 const ControlledReducerExampleContainer = props => (
   <StatechartProvider chart={chart} logic={logic}>
@@ -97,29 +105,27 @@ const ControlledReducerExampleContainer = props => (
         <div>
           <div>
             {/* 
-              Simple Button Bar to select the varying states of the TemperatureConverter 
+              // Simple Button Bar to select the varying states of the TemperatureConverter 
             */}
-            <button onClick={makeHandler(send)(AUTONOMOUS)}>
-              {AUTONOMOUS}
-            </button>
-            <button onClick={makeHandler(send)(PARTIALLY_CONTROLLED)}>
-              {PARTIALLY_CONTROLLED}
-            </button>
-            <button onClick={makeHandler(send)(FULLY_CONTROLLED)}>
-              {FULLY_CONTROLLED}
-            </button>
-            <button onClick={makeHandler(send)(DEFAULT_VALUE)}>
-              {DEFAULT_VALUE}
-            </button>
-            <button onClick={makeHandler(send)(DEFAULT_VALUE_ERROR)}>
-              {DEFAULT_VALUE_ERROR}
-            </button>
-            <button onClick={makeHandler(send)(MISSING_HANDLER_ERROR)}>
-              {MISSING_HANDLER_ERROR}
-            </button>
+            {[
+              AUTONOMOUS,
+              FULLY_CONTROLLED,
+              PARTIALLY_CONTROLLED,
+              DEFAULT_VALUE,
+              DEFAULT_VALUE_ERROR,
+              MISSING_HANDLER_ERROR
+            ].map(key => (
+              <StyledButton
+                key={key}
+                selected={machineState.value === key}
+                onClick={makeHandler(send)(key)}
+              >
+                {key}
+              </StyledButton>
+            ))}
           </div>
           {/* 
-            Get preconfigured TemperatureConverter based on state
+            // Get preconfigured TemperatureConverter based on state
           */}
           {getComponentForState(machineState.value)}
         </div>
