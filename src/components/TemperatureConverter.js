@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
 import ControllableReducerProvider from "../providers/ControllableReducerProvider";
 
@@ -35,7 +35,7 @@ const convertFahrenheitToCelsius = fahrenheit =>
   (Number(fahrenheit) - 32) * (5 / 9);
 const makeHandler = dispatch => action => event => dispatch(action(event));
 const isConversionCorrect = (celcius, fahrenheit) =>
-  fahrenheit === convertCelsiusToFahrenheit(celcius);
+  Number(fahrenheit).toFixed(5) === convertCelsiusToFahrenheit(celcius).toFixed(5);
 
 // Create the actions for the reducer [can be included in another file]
 
@@ -62,7 +62,7 @@ const fahrenheitInputChanged = event => {
 const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
   switch (action.type) {
     case "INIT": {
-      const { fahrenheitValue, celciusValue } = state;
+      const { celciusValue } = state;
       return {
         celciusValue,
         fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)

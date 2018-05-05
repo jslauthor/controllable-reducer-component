@@ -1,11 +1,6 @@
-import React, { Component } from "react";
-import styled from "styled-components";
+import React from "react";
 import TemperatureConverterExample from "./components/TemperatureConverterExample";
 
-class App extends Component {
-  render() {
-    return <TemperatureConverterExample />;
-  }
-}
+const App = () => <TemperatureConverterExample />;
 
 export default App;

@@ -97,15 +97,14 @@ const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
 // like <input /> that don't also follow the rule of "no value allowed if there is a default value"
 
 const getReducedState = (state) => {
-  const reducedState = Object.assign({}, state);
   getControlledProps(state).forEach(key => {
     const changeHandlerName = getChangeHandler(key);
-    if ( reducedState[getDefaultName(key)]) {
-      delete reducedState[key];
-      delete reducedState[changeHandlerName];
+    if ( state[getDefaultName(key)]) {
+      delete state[key];
+      delete state[changeHandlerName];
     }
   });
-  return reducedState;
+  return state;
 };
 
 // TODO: Write tests for this
@@ -168,8 +167,12 @@ class ControllableReducer extends React.Component {
   };
 
   render() {
-    // console.log(getReducedState({...this.props, ...this.state.reducerState}));
     // Yes, this creates a new object each time. Need to revisit this.
+    console.log({
+      dispatch: this.dispatch,
+      ...getReducedState({...this.props, ...this.state.reducerState}),
+      ...getControlledMetadata(this.state)
+    })
     return this.props.children({
       dispatch: this.dispatch,
       ...getReducedState({...this.props, ...this.state.reducerState}),

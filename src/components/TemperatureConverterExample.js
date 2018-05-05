@@ -1,11 +1,12 @@
-import React, { Component } from "react";
+import React from "react";
 import styled from "styled-components";
-import { makeHandler, logMachineChange } from "../utils/StatechartUtils";
+import { makeHandler } from "../utils/StatechartUtils";
 import StatechartProvider from "../providers/StatechartProvider";
 import {
   chart,
   logic,
-  stateObj
+  stateObj,
+  states
 } from "../charts/ControlledReducerExampleChart";
 import TemperatureConverter from "./TemperatureConverter";
 
@@ -26,6 +27,7 @@ const StyledButton = styled.span`
   display: inline-flex;
   align-items: center;
   border-radius: 3px;
+  font-size: 10px;
 `;
 
 class FullyControlledTemperatureConverter extends React.Component {
@@ -90,6 +92,10 @@ const getComponentForState = state => {
           defaultFahrenheitValue={131}
         />
       );
+    case DEFAULT_VALUE_ERROR:
+      return (
+        <TemperatureConverter celciusValue={200} defaultCelciusValue={55} />
+      );
     case MISSING_HANDLER_ERROR:
       return <TemperatureConverter celciusValue={55} fahrenheitValue={200} />;
   }
@@ -107,14 +113,7 @@ const ControlledReducerExampleContainer = props => (
             {/* 
               // Simple Button Bar to select the varying states of the TemperatureConverter 
             */}
-            {[
-              AUTONOMOUS,
-              FULLY_CONTROLLED,
-              PARTIALLY_CONTROLLED,
-              DEFAULT_VALUE,
-              DEFAULT_VALUE_ERROR,
-              MISSING_HANDLER_ERROR
-            ].map(key => (
+            {states.map(key => (
               <StyledButton
                 key={key}
                 selected={machineState.value === key}
