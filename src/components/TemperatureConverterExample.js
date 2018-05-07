@@ -106,7 +106,7 @@ class ControlRevertTemperatureConverter extends React.Component {
 const getComponentForState = state => {
   switch (state) {
     case AUTONOMOUS:
-      return <TemperatureConverter />;
+      return <TemperatureConverter key="autonomous" />;
     case FULLY_CONTROLLED:
       return <FullyControlledTemperatureConverter />;
     case PARTIALLY_CONTROLLED:
@@ -116,16 +116,17 @@ const getComponentForState = state => {
     case DEFAULT_VALUE:
       return (
         <TemperatureConverter
+          key="defaultValue"
           defaultCelciusValue={55}
           defaultFahrenheitValue={131}
         />
       );
     case DEFAULT_VALUE_ERROR:
       return (
-        <TemperatureConverter celciusValue={200} defaultCelciusValue={55} />
+        <TemperatureConverter key="defaultValueError" celciusValue={200} defaultCelciusValue={55} />
       );
     case MISSING_HANDLER_ERROR:
-      return <TemperatureConverter celciusValue={55} fahrenheitValue={200} />;
+      return <TemperatureConverter key="missingHandlerError" celciusValue={55} fahrenheitValue={200} />;
   }
 };
 
