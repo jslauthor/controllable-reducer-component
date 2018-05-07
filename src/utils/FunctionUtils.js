@@ -1,5 +1,8 @@
-const noop = () => {};
+export const arr = [];
+
 // Call a function if it exists
 export const callFn = (fn = null) => (...args) => {
-  fn ? fn(...args) : noop;
+  if (typeof fn === 'function') {
+    fn(...args);
+  }
 };

@@ -127,6 +127,8 @@ const getComponentForState = state => {
       );
     case MISSING_HANDLER_ERROR:
       return <TemperatureConverter key="missingHandlerError" celciusValue={55} fahrenheitValue={200} />;
+    default: 
+      return null;
   }
 };
 

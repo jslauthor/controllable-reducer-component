@@ -1,115 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
-import warning from "fbjs/lib/warning";
 import update from "immutability-helper";
-import { weakMemo } from "../utils/MemoizationUtils";
 import { callFn } from "../utils/FunctionUtils";
-
-const arr = [];
-const titleCase = str => str.charAt(0).toUpperCase() + str.substr(1);
-const getChangeHandler = str => `on${titleCase(str)}Change`;
-const getDefaultName = str => `default${titleCase(str)}`;
-const sentenceJoin = arr =>
-  arr.reduce(
-    (str, value, index) =>
-      str +
-      value +
-      (index === arr.length - 2
-        ? `, and `
-        : index !== arr.length - 1 && arr.length !== 0
-          ? `, `
-          : ``),
-    ""
-  );
-
-const invariantForMissingAndDefaultProps = weakMemo(
-  props => ({ controlledPropsFlags }) => {
-    const controlledProps = getControlledProps(props);
-    // TODO: Only fire for dev here __DEV__ here
-    if (
-      process.env.NODE_ENV === "production" ||
-      (controlledProps.length === 0 || controlledPropsFlags.size === 0)
-    ) {
-      return;
-    }
-
-    const missingHandlers = controlledProps.reduce((acc, prop) => {
-      const handlerProp = getChangeHandler(prop);
-      if (controlledPropsFlags.has(prop) && props[handlerProp] === undefined) {
-        acc.push(handlerProp);
-      }
-      return acc;
-    }, []);
-
-    // Display warning if a controlled prop is supplied without an onChange handler
-    warning(
-      missingHandlers.length === 0,
-      `To take control over this component, Controllable requires %s!`,
-      sentenceJoin(missingHandlers)
-    );
-
-    const conflictingDefaults = controlledProps.reduce(
-      (acc, prop) => {
-        const defaultProp = getDefaultName(prop);
-        if (
-          controlledPropsFlags.has(prop) &&
-          props[defaultProp] !== undefined
-        ) {
-          acc[0].push(prop);
-          acc[1].push(defaultProp);
-        }
-        return acc;
-      },
-      [[], []] // Pair? lol
-    );
-
-    // Display warning if a controlled prop is supplied with a default value
-    warning(
-      conflictingDefaults[0].length === 0,
-      `Controllable components require a controlled prop or a default prop, but not both.` +
-        ` Select either %s, or %s for this component!`,
-      sentenceJoin(conflictingDefaults[0]),
-      sentenceJoin(conflictingDefaults[1])
-    );
-  }
-);
-
-const invariantForControlChange = (prevState = {}, nextProps = {}, key) => {
-  if (process.env.NODE_ENV !== "production" && prevState[key]) {
-    warning(
-      nextProps[key] !== undefined,
-      `A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`
-    );
-  }
-};
-
-const getSafeValue = weakMemo(value => (Array.isArray(value) && value) || arr);
-const getControlledProps = weakMemo(({ controlledProps } = {}) =>
-  getSafeValue(controlledProps)
-);
-
-const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
-  const controlledProps = Array.from(controlledPropsFlags);
-  return {
-    controlledProps,
-    isControlled: controlledProps.length > 0
-  };
-});
-
-// If we have a default value and the reducer supplied default state, we must delete it for components
-// like <input /> that don't also follow the rule of "no value allowed if there is a default value"
-
-const getReducedState = state => {
-  getControlledProps(state).forEach(key => {
-    const changeHandlerName = getChangeHandler(key);
-    if (state[getDefaultName(key)]) {
-      delete state[key];
-      delete state[changeHandlerName];
-    }
-  });
-  return state;
-};
-
+import { getChangeHandler } from "../utils/StringUtils";
+import {
+  getControlledProps,
+  getControlledMetadata,
+  getReducedState
+} from "../utils/ReducerProviderUtils";
+import {
+  invariantForMissingAndDefaultProps,
+  invariantForControlChange
+} from "../utils/ErrorUtils";
+ 
 class ControllableReducer extends React.Component {
   state = {
     reducerState: {},
@@ -176,11 +79,7 @@ class ControllableReducer extends React.Component {
 
   render() {
     // Yes, this creates a new object each time. Need to revisit this.
-    console.log({
-      dispatch: this.dispatch,
-      ...getReducedState({ ...this.props, ...this.state.reducerState }),
-      ...getControlledMetadata(this.state)
-    });
+    // That said, reducerState may not change
     return this.props.children({
       dispatch: this.dispatch,
       ...getReducedState({ ...this.props, ...this.state.reducerState }),

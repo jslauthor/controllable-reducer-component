@@ -3,7 +3,7 @@
 /* Statechart Utils */
 
 const ON_COMMAND = "on";
-const ON_ENTRY = "onEntry";
+// const ON_ENTRY = "onEntry";
 const ON_EXIT = "onExit";
 
 /* States */
