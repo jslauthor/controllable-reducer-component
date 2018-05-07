@@ -13,7 +13,7 @@ import {
   invariantForControlChange
 } from "../utils/ErrorUtils";
  
-class ControllableReducer extends React.Component {
+class ControllableReducerProvider extends React.Component {
   state = {
     reducerState: {},
     controlledPropsFlags: new Set()
@@ -88,17 +88,17 @@ class ControllableReducer extends React.Component {
   }
 }
 
-ControllableReducer.displayName = "ControllableReducer";
+ControllableReducerProvider.displayName = "ControllableReducerProvider";
 
-ControllableReducer.propTypes = {
+ControllableReducerProvider.propTypes = {
   controlledProps: PropTypes.array.isRequired,
   initialState: PropTypes.object,
   reducer: PropTypes.func.isRequired,
   autoMergeProps: PropTypes.bool.isRequired
 };
 
-ControllableReducer.defaultProps = {
+ControllableReducerProvider.defaultProps = {
   autoMergeProps: true
 };
 
-export default ControllableReducer;
+export default ControllableReducerProvider;
