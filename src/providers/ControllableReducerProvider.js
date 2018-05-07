@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import invariant from "fbjs/lib/invariant";
 import warning from "fbjs/lib/warning";
+import update from "immutability-helper";
 import { weakMemo } from "../utils/MemoizationUtils";
 import { callFn } from "../utils/FunctionUtils";
 
@@ -26,7 +26,10 @@ const invariantForMissingAndDefaultProps = weakMemo(
   props => ({ controlledPropsFlags }) => {
     const controlledProps = getControlledProps(props);
     // TODO: Only fire for dev here __DEV__ here
-    if (controlledProps.length === 0 || controlledPropsFlags.size === 0) {
+    if (
+      process.env.NODE_ENV === "production" ||
+      (controlledProps.length === 0 || controlledPropsFlags.size === 0)
+    ) {
       return;
     }
 
@@ -41,7 +44,7 @@ const invariantForMissingAndDefaultProps = weakMemo(
     // Display warning if a controlled prop is supplied without an onChange handler
     warning(
       missingHandlers.length === 0,
-      `To take control over this component,` + ` Controllable requires %s!`,
+      `To take control over this component, Controllable requires %s!`,
       sentenceJoin(missingHandlers)
     );
 
@@ -72,7 +75,7 @@ const invariantForMissingAndDefaultProps = weakMemo(
 );
 
 const invariantForControlChange = (prevState = {}, nextProps = {}, key) => {
-  if (prevState[key]) {
+  if (process.env.NODE_ENV !== "production" && prevState[key]) {
     warning(
       nextProps[key] !== undefined,
       `A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`
@@ -96,19 +99,16 @@ const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
 // If we have a default value and the reducer supplied default state, we must delete it for components
 // like <input /> that don't also follow the rule of "no value allowed if there is a default value"
 
-const getReducedState = (state) => {
+const getReducedState = state => {
   getControlledProps(state).forEach(key => {
     const changeHandlerName = getChangeHandler(key);
-    if ( state[getDefaultName(key)]) {
+    if (state[getDefaultName(key)]) {
       delete state[key];
       delete state[changeHandlerName];
     }
   });
   return state;
 };
-
-// TODO: Write tests for this
-// TODO: Write docs for this
 
 class ControllableReducer extends React.Component {
   state = {
@@ -134,9 +134,16 @@ class ControllableReducer extends React.Component {
         // Throw warning if parent relinquishes control of any property
         invariantForControlChange(state.reducerState, nextProps, key);
       }
-      // Assign incoming property to internal state
-      if (state.reducerState[key] !== nextProps[key] && keyIsControlled) {
-        state.reducerState = { ...state.reducerState, [key]: nextProps[key] };
+      // Assign incoming property to internal state. If props.autoMergeProps is false, the component
+      // will expect the reducer to handle merging via action.metadata.props
+      if (
+        nextProps.autoMergeProps &&
+        state.reducerState[key] !== nextProps[key] &&
+        keyIsControlled
+      ) {
+        state.reducerState = update(state.reducerState, {
+          $set: { [key]: nextProps[key] }
+        });
       }
       return state;
     }, prevState);
@@ -149,7 +156,8 @@ class ControllableReducer extends React.Component {
   dispatch = action => {
     action.metadata = {
       ...action.metadata,
-      ...getControlledMetadata(this.state)
+      ...getControlledMetadata(this.state),
+      props: this.props
     };
     // This updates the state using the reducer and calls all controlled
     // change handlers if a change occurred
@@ -170,12 +178,12 @@ class ControllableReducer extends React.Component {
     // Yes, this creates a new object each time. Need to revisit this.
     console.log({
       dispatch: this.dispatch,
-      ...getReducedState({...this.props, ...this.state.reducerState}),
+      ...getReducedState({ ...this.props, ...this.state.reducerState }),
       ...getControlledMetadata(this.state)
-    })
+    });
     return this.props.children({
       dispatch: this.dispatch,
-      ...getReducedState({...this.props, ...this.state.reducerState}),
+      ...getReducedState({ ...this.props, ...this.state.reducerState }),
       ...getControlledMetadata(this.state)
     });
   }
@@ -186,7 +194,12 @@ ControllableReducer.displayName = "ControllableReducer";
 ControllableReducer.propTypes = {
   controlledProps: PropTypes.array.isRequired,
   initialState: PropTypes.object,
-  reducer: PropTypes.func.isRequired
+  reducer: PropTypes.func.isRequired,
+  autoMergeProps: PropTypes.bool.isRequired
+};
+
+ControllableReducer.defaultProps = {
+  autoMergeProps: true
 };
 
 export default ControllableReducer;

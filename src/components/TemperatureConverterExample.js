@@ -16,7 +16,8 @@ const {
   PARTIALLY_CONTROLLED,
   DEFAULT_VALUE,
   DEFAULT_VALUE_ERROR,
-  MISSING_HANDLER_ERROR
+  MISSING_HANDLER_ERROR,
+  CONTROL_REVERT_ERROR
 } = stateObj;
 
 const StyledButton = styled.span`
@@ -77,6 +78,31 @@ class PartiallyControlledTemperatureConverter extends React.Component {
   }
 }
 
+class ControlRevertTemperatureConverter extends React.Component {
+  state = {
+    celciusValue: 55
+  };
+
+  constructor(props) {
+    super(props);
+    setTimeout(() => this.setState({celciusValue: undefined}), 500);
+  }
+
+  onCelciusChange = celcius => {
+    this.setState({ celciusValue: celcius });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        initialState={this.state}
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+      />
+    );
+  }
+}
+
 const getComponentForState = state => {
   switch (state) {
     case AUTONOMOUS:
@@ -85,6 +111,8 @@ const getComponentForState = state => {
       return <FullyControlledTemperatureConverter />;
     case PARTIALLY_CONTROLLED:
       return <PartiallyControlledTemperatureConverter />;
+    case CONTROL_REVERT_ERROR: 
+      return <ControlRevertTemperatureConverter />; 
     case DEFAULT_VALUE:
       return (
         <TemperatureConverter

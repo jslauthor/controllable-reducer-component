@@ -35,7 +35,8 @@ const convertFahrenheitToCelsius = fahrenheit =>
   (Number(fahrenheit) - 32) * (5 / 9);
 const makeHandler = dispatch => action => event => dispatch(action(event));
 const isConversionCorrect = (celcius, fahrenheit) =>
-  Number(fahrenheit).toFixed(5) === convertCelsiusToFahrenheit(celcius).toFixed(5);
+  Number(fahrenheit).toFixed(5) ===
+  convertCelsiusToFahrenheit(celcius).toFixed(5);
 
 // Create the actions for the reducer [can be included in another file]
 

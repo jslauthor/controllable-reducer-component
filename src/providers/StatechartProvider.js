@@ -1,7 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import invariant from "fbjs/lib/invariant";
-import warning from "fbjs/lib/warning";
 import { Machine } from "xstate";
 import { callFn } from "../utils/FunctionUtils";
 
