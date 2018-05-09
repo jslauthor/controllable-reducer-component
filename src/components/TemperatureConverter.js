@@ -6,7 +6,19 @@ import ControllableReducerProvider from "../providers/ControllableReducerProvide
 
 // Define styled components that will compose into Temperature Converter
 
-const Container = styled.section`
+const TemperatureContainer = styled.div`
+  margin-top: 20px;
+  border: 1px solid #CCC;
+  padding: 10px;
+  div {
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-style: italic;
+
+  }
+`
+
+const InputContainer = styled.section`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -15,7 +27,6 @@ const Container = styled.section`
   color: white;
   border-radius: 3px;
   max-width: 300px;
-  margin: 20px;
   border: ${({ wrongResult }) => (wrongResult ? "1px solid red;" : "none;")}
     /** 
   * Wow prettier sucks
@@ -99,7 +110,8 @@ const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
   }
 };
 
-// Define which props are "controllable"
+// Define which props are "controllable".
+// Can be typed in flow with $ElementType: https://flow.org/en/docs/types/utilities/#toc-elementtype
 
 const controlledProps = ["celciusValue", "fahrenheitValue"];
 
@@ -121,22 +133,27 @@ class TemperatureConverter extends React.Component {
           defaultFahrenheitValue
         }) => {
           return (
-            <Container
-              wrongResult={!isConversionCorrect(celciusValue, fahrenheitValue)}
-            >
-              <input
-                value={celciusValue}
-                defaultValue={defaultCelciusValue}
-                onChange={makeHandler(dispatch)(celciusInputChanged)}
-              />
-              <span>Celcius =</span>
-              <input
-                value={fahrenheitValue}
-                defaultValue={defaultFahrenheitValue}
-                onChange={makeHandler(dispatch)(fahrenheitInputChanged)}
-              />
-              <span>Fahrenheit</span>
-            </Container>
+            <TemperatureContainer>
+              <div>Input a temperature</div>
+              <InputContainer
+                wrongResult={
+                  !isConversionCorrect(celciusValue, fahrenheitValue)
+                }
+              >
+                <input
+                  value={celciusValue}
+                  defaultValue={defaultCelciusValue}
+                  onChange={makeHandler(dispatch)(celciusInputChanged)}
+                />
+                <span>Celcius =</span>
+                <input
+                  value={fahrenheitValue}
+                  defaultValue={defaultFahrenheitValue}
+                  onChange={makeHandler(dispatch)(fahrenheitInputChanged)}
+                />
+                <span>Fahrenheit</span>
+              </InputContainer>
+            </TemperatureContainer>
           );
         }}
       </ControllableReducerProvider>

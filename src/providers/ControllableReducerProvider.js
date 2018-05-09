@@ -79,8 +79,8 @@ class ControllableReducerProvider extends React.Component {
 
   render() {
     // Yes, this creates a new object each time. Need to revisit this.
-    // That said, reducerState may not change
     return this.props.children({
+      // Assign this first so that the parent can override it in the props
       dispatch: this.dispatch,
       ...getReducedState({ ...this.props, ...this.state.reducerState }),
       ...getControlledMetadata(this.state)
