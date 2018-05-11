@@ -1,6 +1,6 @@
 import React from "react";
-import TemperatureConverterExample from "./components/TemperatureConverterExample";
+import ControlledReduderProviderExamples from "./components/ControlledReduderProviderExamples";
 
-const App = () => <TemperatureConverterExample />;
+const App = () => <ControlledReduderProviderExamples />;
 
 export default App;

@@ -16,6 +16,8 @@ const DEFAULT_VALUE_ERROR = "DEFAULT_VALUE_ERROR";
 const MISSING_HANDLER_ERROR = "MISSING_HANDLER_ERROR";
 const CONTROL_REVERT_ERROR = "CONTROL_REVERT_ERROR";
 
+const SIMPLE_VALUE = "SIMPLE_VALUE";
+
 /* states */
 
 export const states = [
@@ -25,7 +27,8 @@ export const states = [
   DEFAULT_VALUE,
   CONTROL_REVERT_ERROR,
   DEFAULT_VALUE_ERROR,
-  MISSING_HANDLER_ERROR
+  MISSING_HANDLER_ERROR,
+  SIMPLE_VALUE
 ];
 
 export const stateObj = states.reduce(

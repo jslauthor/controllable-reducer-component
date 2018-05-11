@@ -10,10 +10,10 @@ import StatechartProvider from "../providers/StatechartProvider";
 import {
   chart,
   logic,
-  stateObj,
-  states
+  stateObj
 } from "../charts/ControlledReducerExampleChart";
 import TemperatureConverter from "./TemperatureConverter";
+import SimpleValueComponent from "./SimpleValueComponent";
 
 registerLanguage("jsx", jsx);
 
@@ -24,7 +24,8 @@ const {
   DEFAULT_VALUE,
   DEFAULT_VALUE_ERROR,
   MISSING_HANDLER_ERROR,
-  CONTROL_REVERT_ERROR
+  CONTROL_REVERT_ERROR,
+  SIMPLE_VALUE
 } = stateObj;
 
 const StyledButton = styled.span`
@@ -171,7 +172,7 @@ const getComponentForState = state => {
           description={`This is an autonomous component and can operate without any incoming
           props. It is "uncontrolled". The state is managed within the
           familiar reducer pattern inside TemperatureConverter. A parent can
-          override a specificied set of props as demonstrated in the following
+          override celciusValue and fahrenheitValue as demonstrated in the following
           examples.`}
           exampleComponent={<TemperatureConverter key="autonomous" />}
           codeSample={`<TemperatureConverter />`}
@@ -289,8 +290,9 @@ const getComponentForState = state => {
           title="Default Value"
           description={`
             If a component is uncontrolled, but the user wishes to supply a defaultValue, simply
-            supply a defaultPropName for those values. A controlled component will throw a console error
-            if a default value is also supplied. This behaves the same as the React <input />.
+            supply a defaultPropName, e.g. defaultCelciusValue, for those values. 
+            A controlled component will throw a console error if a default value is also supplied. 
+            This behaves the same as the React <input />. 
           `}
           exampleComponent={
             <TemperatureConverter
@@ -331,28 +333,38 @@ const getComponentForState = state => {
         />
       );
     case MISSING_HANDLER_ERROR:
-    return (
-      <ExampleTemplate
-        title="Missing Handler Error"
-        description={`
+      return (
+        <ExampleTemplate
+          title="Missing Handler Error"
+          description={`
       NOTE: Please open your console to see the warning. 
       If a parent component supplies a controlled value without its matching handler, it will
       display a console error.
       `}
-        exampleComponent={
-          <TemperatureConverter
-          key="missingHandlerError"
-          celciusValue={55}
-          fahrenheitValue={200}
-        />
-        }
-        codeSample={`<TemperatureConverter
+          exampleComponent={
+            <TemperatureConverter
+              key="missingHandlerError"
+              celciusValue={55}
+              fahrenheitValue={200}
+            />
+          }
+          codeSample={`<TemperatureConverter
   celciusValue={55}
   fahrenheitValue={200}
   // missing onCelciusValueChange and onFahrenheightValueChange
 />`}
-      />
-    );    
+        />
+      );
+    case SIMPLE_VALUE:
+      return (
+        <ExampleTemplate
+          title="Simple Value Input"
+          description={`This component encapsulates all state within a single value prop
+      `}
+          exampleComponent={<SimpleValueComponent />}
+          codeSample={`<SimpleValueComponent />`}
+        />
+      );
     default:
       return null;
   }
@@ -370,8 +382,26 @@ const ControlledReducerExampleContainer = props => (
             {/* 
               // Simple Button Bar to select the varying states of the TemperatureConverter 
             */}
-            <h5>ControlledReducerProvider Examples</h5>
-            {states.map(key => (
+            <h5>TemperatureConverter Examples</h5>
+            {[
+              AUTONOMOUS,
+              FULLY_CONTROLLED,
+              PARTIALLY_CONTROLLED,
+              DEFAULT_VALUE,
+              DEFAULT_VALUE_ERROR,
+              MISSING_HANDLER_ERROR,
+              CONTROL_REVERT_ERROR
+            ].map(key => (
+              <StyledButton
+                key={key}
+                selected={machineState.value === key}
+                onClick={makeHandler(send)(key)}
+              >
+                {key}
+              </StyledButton>
+            ))}
+            <h5>SimpleValueComponent Examples</h5>
+            {[SIMPLE_VALUE].map(key => (
               <StyledButton
                 key={key}
                 selected={machineState.value === key}
