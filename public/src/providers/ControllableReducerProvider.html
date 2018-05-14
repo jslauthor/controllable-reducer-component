@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ControllableReducerProvider.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="../../docs/docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>ControllableReducerProvider.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>;
+<span class="hljs-keyword">import</span> PropTypes <span class="hljs-keyword">from</span> <span class="hljs-string">"prop-types"</span>;
+<span class="hljs-keyword">import</span> update <span class="hljs-keyword">from</span> <span class="hljs-string">"immutability-helper"</span>;
+<span class="hljs-keyword">import</span> { callFn } <span class="hljs-keyword">from</span> <span class="hljs-string">"../utils/FunctionUtils"</span>;
+<span class="hljs-keyword">import</span> { getChangeHandler } <span class="hljs-keyword">from</span> <span class="hljs-string">"../utils/StringUtils"</span>;
+<span class="hljs-keyword">import</span> {
+  getControlledProps,
+  getControlledMetadata,
+  getReducedState
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"../utils/ReducerProviderUtils"</span>;
+<span class="hljs-keyword">import</span> {
+  invariantForMissingAndDefaultProps,
+  invariantForControlChange
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"../utils/ErrorUtils"</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ControllableReducerProvider</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>reducerState contains all the reducer state that is provided to the children render prop
+controlledPropsFlags contains the keys of properties that have received a defined value</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  state = {
+    <span class="hljs-attr">reducerState</span>: {},
+    <span class="hljs-attr">controlledPropsFlags</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>()
+  };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Hydrate the state with an INIT call to the reducer</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">constructor</span>(props) {
+    <span class="hljs-keyword">super</span>(props);
+    <span class="hljs-keyword">this</span>.state.reducerState = <span class="hljs-keyword">this</span>.props.reducer(<span class="hljs-keyword">this</span>.props.initialState, {
+      <span class="hljs-attr">type</span>: <span class="hljs-string">"INIT"</span>
+    });
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Use getDerivedStateFromProps to reconcile incoming props with internal state</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">static</span> getDerivedStateFromProps = <span class="hljs-function">(<span class="hljs-params">nextProps, prevState</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> derivedState = getControlledProps(nextProps).reduce(<span class="hljs-function">(<span class="hljs-params">state, key</span>) =&gt;</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Controllers of controlled components should never relinquish control</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (nextProps[key] !== <span class="hljs-literal">undefined</span>) {
+        state.controlledPropsFlags = state.controlledPropsFlags.add(key);
+      }
+      <span class="hljs-keyword">const</span> keyIsControlled = state.controlledPropsFlags.has(key);
+      <span class="hljs-keyword">if</span> (keyIsControlled) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Throw warning if parent relinquishes control of any property</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        invariantForControlChange(state.reducerState, nextProps, key);
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Assign incoming property to internal state. If props.autoMergeProps is false, the component
+will expect the reducer to handle merging via action.metadata.props</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (
+        nextProps.autoMergeProps &amp;&amp;
+        state.reducerState[key] !== nextProps[key] &amp;&amp;
+        keyIsControlled
+      ) {
+        state.reducerState = update(state.reducerState, {
+          <span class="hljs-attr">$set</span>: { [key]: nextProps[key] }
+        });
+      }
+      <span class="hljs-keyword">return</span> state;
+    }, prevState);
+    <span class="hljs-keyword">if</span> (nextProps != <span class="hljs-literal">null</span>) {
+      invariantForMissingAndDefaultProps(nextProps)(derivedState);
+    }
+    <span class="hljs-keyword">return</span> derivedState;
+  };
+
+  dispatch = <span class="hljs-function"><span class="hljs-params">action</span> =&gt;</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Provide relevant metadata inside action</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    action.metadata = {
+      ...action.metadata,
+      ...getControlledMetadata(<span class="hljs-keyword">this</span>.state),
+      <span class="hljs-attr">props</span>: <span class="hljs-keyword">this</span>.props
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>This updates the state using the reducer and calls all controlled
+change handlers if a change occurred</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.setState(
+      { <span class="hljs-attr">reducerState</span>: <span class="hljs-keyword">this</span>.props.reducer(<span class="hljs-keyword">this</span>.state.reducerState, action) },
+      () =&gt; {
+        <span class="hljs-keyword">this</span>.state.controlledPropsFlags.forEach(<span class="hljs-function"><span class="hljs-params">key</span> =&gt;</span> {
+          <span class="hljs-keyword">this</span>.props[key] !== <span class="hljs-keyword">this</span>.state.reducerState[key] &amp;&amp;
+            callFn(<span class="hljs-keyword">this</span>.props[getChangeHandler(key)])(
+              <span class="hljs-keyword">this</span>.state.reducerState[key]
+            );
+        });
+      }
+    );
+  };
+
+  render() {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Yes, this creates a new object each time. Need to revisit this.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.children({</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Assign this first so that the parent can override it in the props</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      dispatch: <span class="hljs-keyword">this</span>.dispatch,
+      ...getReducedState({ ...this.props, ...this.state.reducerState }),
+      ...getControlledMetadata(<span class="hljs-keyword">this</span>.state)
+    });
+  }
+}
+
+ControllableReducerProvider.displayName = <span class="hljs-string">"ControllableReducerProvider"</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Will implement this in Flow</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>ControllableReducerProvider.propTypes = {
+  <span class="hljs-attr">controlledProps</span>: PropTypes.array.isRequired,
+  <span class="hljs-attr">initialState</span>: PropTypes.object,
+  <span class="hljs-attr">reducer</span>: PropTypes.func.isRequired,
+  <span class="hljs-attr">autoMergeProps</span>: PropTypes.bool.isRequired
+};
+
+ControllableReducerProvider.defaultProps = {
+  <span class="hljs-attr">autoMergeProps</span>: <span class="hljs-literal">true</span>
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> ControllableReducerProvider;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

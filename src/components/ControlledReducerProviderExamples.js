@@ -60,6 +60,16 @@ const TemperatureConverterContainer = styled(FlexRow)`
     color: #888;
     font-style: italic;
   }
+
+  a {
+    font-size: 12px;
+    text-decoration: none;
+    color: #333;
+  }
+
+  a: hover {
+    color: #888;
+  }
 `;
 
 const NavigationSection = styled(FlexColumn)`
@@ -379,6 +389,22 @@ const ControlledReducerExampleContainer = props => (
       return (
         <TemperatureConverterContainer>
           <NavigationSection>
+            {/* 
+              // Simple Button Bar to select the varying states of the TemperatureConverter 
+            */}
+            <h5>Code Samples</h5>
+            <a
+              href="/src/providers/ControllableReducerProvider.html"
+              target="_blank"
+            >
+              ControllableReducerProvider
+            </a>
+            <a href="/src/components/TemperatureConverter.html" target="_blank">
+              TemperatureConverter
+            </a>
+            <a href="/src/components/SimpleValueComponent.html" target="_blank">
+              SimpleValueComponent
+            </a>
             {/* 
               // Simple Button Bar to select the varying states of the TemperatureConverter 
             */}

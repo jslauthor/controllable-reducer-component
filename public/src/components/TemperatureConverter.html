@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>TemperatureConverter.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="../../docs/docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>TemperatureConverter.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">import</span> React <span class="hljs-keyword">from</span> <span class="hljs-string">"react"</span>;
+<span class="hljs-keyword">import</span> styled <span class="hljs-keyword">from</span> <span class="hljs-string">"styled-components"</span>;
+<span class="hljs-keyword">import</span> ControllableReducerProvider <span class="hljs-keyword">from</span> <span class="hljs-string">"../providers/ControllableReducerProvider"</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>This is a Temperature Converter component as found in the 7 GUIs challenge: <a href="http://eugenkiss.github.io/7guis/tasks/">http://eugenkiss.github.io/7guis/tasks/</a></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Define styled components that will compose into Temperature Converter</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> TemperatureContainer = styled.div<span class="hljs-string">`
+  margin-top: 20px;
+  border: 1px solid #CCC;
+  padding: 10px;
+  div {
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-style: italic;
+
+  }
+`</span>
+
+<span class="hljs-keyword">const</span> InputContainer = styled.section<span class="hljs-string">`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: #333;
+  padding: 10px;
+  color: white;
+  border-radius: 3px;
+  max-width: 300px;
+  border: <span class="hljs-subst">${({ wrongResult }</span>) =&gt; (wrongResult ? "1px solid red;" : "none;")}
+    /** 
+  * Wow prettier sucks
+  */ input {
+    max-width: 50px;
+  }
+
+  * {
+    margin-right: 10px;
+  }
+`</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Some utility methods [can be included in another file]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> convertCelsiusToFahrenheit = <span class="hljs-function"><span class="hljs-params">celcius</span> =&gt;</span> <span class="hljs-built_in">Number</span>(celcius) * (<span class="hljs-number">9</span> / <span class="hljs-number">5</span>) + <span class="hljs-number">32</span>;
+<span class="hljs-keyword">const</span> convertFahrenheitToCelsius = <span class="hljs-function"><span class="hljs-params">fahrenheit</span> =&gt;</span>
+  (<span class="hljs-built_in">Number</span>(fahrenheit) - <span class="hljs-number">32</span>) * (<span class="hljs-number">5</span> / <span class="hljs-number">9</span>);
+<span class="hljs-keyword">const</span> makeHandler = <span class="hljs-function"><span class="hljs-params">dispatch</span> =&gt;</span> action =&gt; <span class="hljs-function"><span class="hljs-params">event</span> =&gt;</span> dispatch(action(event));
+<span class="hljs-keyword">const</span> isConversionCorrect = <span class="hljs-function">(<span class="hljs-params">celcius, fahrenheit</span>) =&gt;</span>
+  <span class="hljs-built_in">Number</span>(fahrenheit).toFixed(<span class="hljs-number">5</span>) ===
+  convertCelsiusToFahrenheit(celcius).toFixed(<span class="hljs-number">5</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Create the actions for the reducer [can be included in another file]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> CELCIUS_INPUT_CHANGED = <span class="hljs-string">"CELCIUS_INPUT_CHANGED"</span>;
+<span class="hljs-keyword">const</span> FAHRENHEIT_INPUT_CHANGED = <span class="hljs-string">"FAHRENHEIT_INPUT_CHANGED"</span>;
+
+<span class="hljs-keyword">const</span> celciusInputChanged = <span class="hljs-function"><span class="hljs-params">event</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">type</span>: CELCIUS_INPUT_CHANGED,
+    <span class="hljs-attr">payload</span>: event.currentTarget.value
+  };
+};
+
+<span class="hljs-keyword">const</span> fahrenheitInputChanged = <span class="hljs-function"><span class="hljs-params">event</span> =&gt;</span> {
+  <span class="hljs-keyword">return</span> {
+    <span class="hljs-attr">type</span>: FAHRENHEIT_INPUT_CHANGED,
+    <span class="hljs-attr">payload</span>: event.currentTarget.value
+  };
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>The reducer used to manage the internal and external state with the component
+[can be included in another file]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> reducer = <span class="hljs-function">(<span class="hljs-params">state = { celciusValue: <span class="hljs-number">10</span>, fahrenheitValue: <span class="hljs-number">0</span> }, action</span>) =&gt;</span> {
+  <span class="hljs-keyword">switch</span> (action.type) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"INIT"</span>: {
+      <span class="hljs-keyword">const</span> { celciusValue } = state;
+      <span class="hljs-keyword">return</span> {
+        celciusValue,
+        <span class="hljs-attr">fahrenheitValue</span>: convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
+    <span class="hljs-keyword">case</span> CELCIUS_INPUT_CHANGED: {
+      <span class="hljs-keyword">const</span> { fahrenheitValue } = state;
+      <span class="hljs-keyword">const</span> celciusValue = action.payload;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Here we check if a particular prop is under the control of the parent.
+If it is, we don’t change the value</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">const</span> { controlledProps } = action.metadata;
+      <span class="hljs-keyword">return</span> {
+        celciusValue,
+        <span class="hljs-attr">fahrenheitValue</span>: controlledProps.includes(<span class="hljs-string">"fahrenheitValue"</span>)
+          ? fahrenheitValue
+          : convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
+    <span class="hljs-keyword">case</span> FAHRENHEIT_INPUT_CHANGED: {
+      <span class="hljs-keyword">const</span> { celciusValue } = state;
+      <span class="hljs-keyword">const</span> fahrenheitValue = action.payload;
+      <span class="hljs-keyword">const</span> { controlledProps } = action.metadata;
+      <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">celciusValue</span>: controlledProps.includes(<span class="hljs-string">"celciusValue"</span>)
+          ? celciusValue
+          : convertFahrenheitToCelsius(fahrenheitValue),
+        fahrenheitValue
+      };
+    }
+    <span class="hljs-keyword">default</span>: {
+      <span class="hljs-keyword">return</span> state;
+    }
+  }
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Define which props are “controllable”.
+Can be typed in flow with $ElementType: <a href="https://flow.org/en/docs/types/utilities/#toc-elementtype">https://flow.org/en/docs/types/utilities/#toc-elementtype</a>
+This is similar to syncPropsToState’s schemaKeys, except the reducer updates state instead of updater functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">const</span> controlledProps = [<span class="hljs-string">"celciusValue"</span>, <span class="hljs-string">"fahrenheitValue"</span>];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Compose ControllableReducerProvider, Container, and inputs</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TemperatureConverter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">React</span>.<span class="hljs-title">Component</span> </span>{
+  render() {
+    <span class="hljs-keyword">return</span> (
+      &lt;ControllableReducerProvider
+        reducer={reducer}
+        controlledProps={controlledProps}
+        {...this.props}
+      &gt;
+        {({
+          dispatch,
+          celciusValue,
+          defaultCelciusValue,
+          fahrenheitValue,
+          defaultFahrenheitValue
+        }) =&gt; {
+          return (
+            &lt;TemperatureContainer&gt;
+              &lt;div&gt;Input a temperature&lt;/div&gt;
+              &lt;InputContainer
+                wrongResult={
+                  !isConversionCorrect(celciusValue, fahrenheitValue)
+                }
+              &gt;
+                &lt;input
+                  value={celciusValue}
+                  defaultValue={defaultCelciusValue}
+                  onChange={makeHandler(dispatch)(celciusInputChanged)}
+                /&gt;
+                &lt;span&gt;Celcius =&lt;/span&gt;
+                &lt;input
+                  value={fahrenheitValue}
+                  defaultValue={defaultFahrenheitValue}
+                  onChange={makeHandler(dispatch)(fahrenheitInputChanged)}
+                /&gt;
+                &lt;span&gt;Fahrenheit&lt;/span&gt;
+              &lt;/InputContainer&gt;
+            &lt;/TemperatureContainer&gt;
+          );
+        }}
+      &lt;/ControllableReducerProvider&gt;
+    );
+  }
+}
+
+export default TemperatureConverter;</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

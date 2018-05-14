@@ -12,13 +12,16 @@ import {
   invariantForMissingAndDefaultProps,
   invariantForControlChange
 } from "../utils/ErrorUtils";
- 
+
 class ControllableReducerProvider extends React.Component {
+  // reducerState contains all the reducer state that is provided to the children render prop
+  // controlledPropsFlags contains the keys of properties that have received a defined value
   state = {
     reducerState: {},
     controlledPropsFlags: new Set()
   };
 
+  // Hydrate the state with an INIT call to the reducer
   constructor(props) {
     super(props);
     this.state.reducerState = this.props.reducer(this.props.initialState, {
@@ -26,6 +29,7 @@ class ControllableReducerProvider extends React.Component {
     });
   }
 
+  // Use getDerivedStateFromProps to reconcile incoming props with internal state
   static getDerivedStateFromProps = (nextProps, prevState) => {
     const derivedState = getControlledProps(nextProps).reduce((state, key) => {
       // Controllers of controlled components should never relinquish control
@@ -57,6 +61,7 @@ class ControllableReducerProvider extends React.Component {
   };
 
   dispatch = action => {
+    // Provide relevant metadata inside action
     action.metadata = {
       ...action.metadata,
       ...getControlledMetadata(this.state),
@@ -90,6 +95,7 @@ class ControllableReducerProvider extends React.Component {
 
 ControllableReducerProvider.displayName = "ControllableReducerProvider";
 
+// Will implement this in Flow
 ControllableReducerProvider.propTypes = {
   controlledProps: PropTypes.array.isRequired,
   initialState: PropTypes.object,

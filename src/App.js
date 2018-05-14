@@ -1,6 +1,6 @@
 import React from "react";
-import ControlledReduderProviderExamples from "./components/ControlledReduderProviderExamples";
+import ControlledReducerProviderExamples from "./components/ControlledReducerProviderExamples";
 
-const App = () => <ControlledReduderProviderExamples />;
+const App = () => <ControlledReducerProviderExamples />;
 
 export default App;
