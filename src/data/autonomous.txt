@@ -1,7 +1,9 @@
-// This is an autonomous component and can operate without any incoming
-// props. It is "uncontrolled". The state is managed within the
-// familiar reducer pattern inside TemperatureConverter. A parent can
-// override celciusValue and fahrenheitValue as demonstrated in the following
-// examples.
+/* 
+ * This is an autonomous TemperatureConverter component and can operate 
+ * without any incoming props. It is "uncontrolled". 
+ * The state is managed within the familiar reducer pattern inside 
+ * TemperatureConverter. A parent can override celciusValue and fahrenheitValue 
+ * as demonstrated in the following examples. 
+*/
 
 <TemperatureConverter />;

@@ -1,0 +1,34 @@
+/*
+ * NOTE: Please open your console to see the warning. 
+ * This component relinquishes control 
+ * of a previously controlled value. The React <input /> 
+ * control disallows this, and we shall
+ * consider it an anti-pattern here as well. 
+ * Once a component supplies a controlled prop, it must always
+ * supply a value for the prop.
+ */
+
+ class ControlRevertTemperatureConverter extends React.Component {
+  state = {
+    celciusValue: 55
+  };
+
+  constructor(props) {
+    super(props);
+    setTimeout(() => this.setState({ celciusValue: undefined }), 500);
+  }
+
+  onCelciusChange = celcius => {
+    this.setState({ celciusValue: celcius });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        initialState={this.state}
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+      />
+    );
+  }
+}

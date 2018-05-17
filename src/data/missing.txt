@@ -1,0 +1,11 @@
+/* 
+ * NOTE: Please open your console to see the warning. 
+ * If a parent component supplies a controlled value without its matching handler, it will
+ * display a console error.
+ */
+
+<TemperatureConverter
+  celciusValue={55}
+  fahrenheitValue={200}
+  // missing onCelciusValueChange and onFahrenheightValueChange
+/>

@@ -6,6 +6,7 @@ import SyntaxHighlighter, {
 import jsx from "react-syntax-highlighter/languages/prism/jsx";
 import prism from "react-syntax-highlighter/styles/prism/prism";
 import { makeHandler } from "../utils/StatechartUtils";
+import { titleCase } from '../utils/StringUtils';
 import StatechartProvider from "../providers/StatechartProvider";
 import {
   chart,
@@ -16,6 +17,12 @@ import TemperatureConverter from "./TemperatureConverter";
 import SimpleValueComponent from "./SimpleValueComponent";
 
 import autonomousTxt from '../data/autonomous.txt';
+import fullyTxt from '../data/fully.txt';
+import partialTxt from '../data/partial.txt';
+import controlTxt from '../data/control.txt';
+import defaultTxt from '../data/default.txt';
+import defaultErrorTxt from '../data/default_error.txt';
+import missingHandlerTxt from '../data/missing.txt';
 
 registerLanguage("jsx", jsx);
 
@@ -121,8 +128,6 @@ const ExampleTemplate = ({
     <ExampleContainer>
       <h6>* Please open your development console to see warnings</h6>
       <h3>{title}</h3>
-      <div>{description}</div>
-      <h4>Code Sample</h4>
       <SyntaxHighlighter language="javascript" style={prism}>
         {codeSample}
       </SyntaxHighlighter>
@@ -181,7 +186,7 @@ const getComponentForState = state => {
     case AUTONOMOUS:
       return (
         <ExampleTemplate
-          title="Autonomous (Just Works™) Example"
+          title="Autonomous (Just Works™) TemperatureConverter Example"
           exampleComponent={<TemperatureConverter key="autonomous" />}
           codeSample={autonomousTxt}
         />
@@ -189,119 +194,31 @@ const getComponentForState = state => {
     case FULLY_CONTROLLED:
       return (
         <ExampleTemplate
-          title="Fully Controlled"
-          description={`This is fully controlled component. The parent manages all its state via props and change handlers.
-          This example simply returns the value of each onChange event for TemperatureConverter. 
-          ControllableReducerProvider takes a set of keys that it will reconcile with the reducer state, e.g. 
-          ["celciusValue", "fahrenheitValue"] for this component. If either of those values are provided, will also
-          expect a change handler in the form of onPropNameChange, like onCelciusValueChange below.`}
+          title="Fully Controlled TemperatureConverter Example"
           exampleComponent={<FullyControlledTemperatureConverter />}
-          codeSample={`class FullyControlledTemperatureConverter extends React.Component {
-  state = {
-    celciusValue: 55,
-    fahrenheitValue: 200
-  };
-
-  onCelciusChange = celcius => {
-    this.setState({ celciusValue: celcius });
-  };
-
-  onFahrenheitChange = fahrenheit => {
-    this.setState({ fahrenheitValue: fahrenheit });
-  };
-
-  render() {
-    return (
-      <TemperatureConverter
-        initialState={this.state}
-        celciusValue={this.state.celciusValue}
-        onCelciusValueChange={this.onCelciusChange}
-        fahrenheitValue={this.state.fahrenheitValue}
-        onFahrenheitValueChange={this.onFahrenheitChange}
-      />
-    );
-  }
-}`}
+          codeSample={fullyTxt}
         />
       );
     case PARTIALLY_CONTROLLED:
       return (
         <ExampleTemplate
-          title="Partially Controlled"
-          description={`
-            This is partially controlled component. The parent manages only the celcius value.
-            Please notice how the component still updates the fahrenheit value when celcius changes, 
-            but when the fahrenheit value changes, celcius remains unchanged since it is "controlled."
-          `}
+          title="Partially Controlled TemperatureConverter Example"
           exampleComponent={<PartiallyControlledTemperatureConverter />}
-          codeSample={`class PartiallyControlledTemperatureConverter extends React.Component {
-  state = {
-    celciusValue: 55
-  };
-
-  onCelciusChange = celcius => {
-    this.setState({ celciusValue: celcius });
-  };
-
-  render() {
-    return (
-      <TemperatureConverter
-        initialState={this.state}
-        celciusValue={this.state.celciusValue}
-        onCelciusValueChange={this.onCelciusChange}
-      />
-    );
-  }
-}`}
+          codeSample={partialTxt}
         />
       );
     case CONTROL_REVERT_ERROR:
       return (
         <ExampleTemplate
-          title="Control Revert Error"
-          description={`
-          NOTE: Please open your console to see the warning. This component relinquishes control 
-          of a previously controlled value. The React <input /> control disallows this, and we shall
-          consider it an anti-pattern here as well. Once a component supplies a controlled prop, it must always
-          supply a value for the prop.  
-        `}
+          title="Control Revert Error TemperatureConverter Example"
           exampleComponent={<ControlRevertTemperatureConverter />}
-          codeSample={`class ControlRevertTemperatureConverter extends React.Component {
-  state = {
-    celciusValue: 55
-  };
-
-  constructor(props) {
-    super(props);
-    setTimeout(() => this.setState({ celciusValue: undefined }), 500);
-  }
-
-  onCelciusChange = celcius => {
-    this.setState({ celciusValue: celcius });
-  };
-
-  render() {
-    return (
-      <TemperatureConverter
-        initialState={this.state}
-        celciusValue={this.state.celciusValue}
-        onCelciusValueChange={this.onCelciusChange}
-      />
-    );
-  }
-}`}
+          codeSample={controlTxt}
         />
       );
     case DEFAULT_VALUE:
       return (
         <ExampleTemplate
-          title="Default Value"
-          description={`
-            If a component is uncontrolled, but the user wishes to supply a defaultValue, simply
-            supply a defaultPropName, e.g. defaultCelciusValue, for those values. 
-            A controlled component will throw a console error if a default value is also supplied. 
-            This behaves the same as the React <input />. 
-          `}
+          title="Default Value TemperatureConverter Example"
           exampleComponent={
             <TemperatureConverter
               key="defaultValue"
@@ -309,21 +226,13 @@ const getComponentForState = state => {
               defaultFahrenheitValue={131}
             />
           }
-          codeSample={`<TemperatureConverter
-  defaultCelciusValue={55}
-  defaultFahrenheitValue={131} 
-/>`}
+          codeSample={defaultTxt}
         />
       );
     case DEFAULT_VALUE_ERROR:
       return (
         <ExampleTemplate
-          title="Default Value Error"
-          description={`
-        NOTE: Please open your console to see the warning. 
-        If a parent component supplies a default value and a controlled value or handler, it will
-        display a console error.
-        `}
+          title="Default Value Error TemperatureConverter Example"
           exampleComponent={
             <TemperatureConverter
               key="defaultValueError"
@@ -332,23 +241,13 @@ const getComponentForState = state => {
               onCelciusValueChange={() => {}}
             />
           }
-          codeSample={`<TemperatureConverter
-  // has celciusValue and defaultCelciusValue 😱
-  celciusValue={200}
-  defaultCelciusValue={55}
-  onCelciusValueChange={someHandler}
-/>`}
+          codeSample={defaultErrorTxt}
         />
       );
     case MISSING_HANDLER_ERROR:
       return (
         <ExampleTemplate
           title="Missing Handler Error"
-          description={`
-      NOTE: Please open your console to see the warning. 
-      If a parent component supplies a controlled value without its matching handler, it will
-      display a console error.
-      `}
           exampleComponent={
             <TemperatureConverter
               key="missingHandlerError"
@@ -356,11 +255,7 @@ const getComponentForState = state => {
               fahrenheitValue={200}
             />
           }
-          codeSample={`<TemperatureConverter
-  celciusValue={55}
-  fahrenheitValue={200}
-  // missing onCelciusValueChange and onFahrenheightValueChange
-/>`}
+          codeSample={missingHandlerTxt}
         />
       );
     case SIMPLE_VALUE:
@@ -377,6 +272,8 @@ const getComponentForState = state => {
       return null;
   }
 };
+
+const titleize = str => str.split('_').map(titleCase).join(' ');
 
 // We'll use David K's xstate library to control the visual states
 // Expect a future RFC that details this 🙋
@@ -421,7 +318,7 @@ const ControlledReducerExampleContainer = props => (
                 selected={machineState.value === key}
                 onClick={makeHandler(send)(key)}
               >
-                {key}
+                {titleize(key)}
               </StyledButton>
             ))}
             <h5>SimpleValueComponent Examples</h5>
@@ -431,7 +328,7 @@ const ControlledReducerExampleContainer = props => (
                 selected={machineState.value === key}
                 onClick={makeHandler(send)(key)}
               >
-                {key}
+                {titleize(key)}
               </StyledButton>
             ))}
           </NavigationSection>

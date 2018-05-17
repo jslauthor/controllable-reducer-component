@@ -1,0 +1,25 @@
+/*
+ * This is partially controlled component. The parent manages only the celcius value.
+ * Please notice how the component still updates the fahrenheit value when celcius changes, 
+ * but when the fahrenheit value changes, celcius remains unchanged since it is "controlled."
+*/
+
+class PartiallyControlledTemperatureConverter extends React.Component {
+  state = {
+    celciusValue: 55
+  };
+
+  onCelciusChange = celcius => {
+    this.setState({ celciusValue: celcius });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        initialState={this.state}
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+      />
+    );
+  }
+}

@@ -1,0 +1,37 @@
+/*
+ * This is fully controlled TemperatureConverter component. 
+ * The parent manages all its state via props and change handlers.
+ * This example simply returns the value of each onChange event for TemperatureConverter. 
+ * ControllableReducerProvider takes a set of keys 
+ * that it will reconcile with the reducer state, e.g. 
+ * ["celciusValue", "fahrenheitValue"] for this component. 
+ * If either of those values are provided, will also
+ * expect a change handler in the form of onPropNameChange, like onCelciusValueChange below.
+ */
+
+class FullyControlledTemperatureConverter extends React.Component {
+  state = {
+    celciusValue: 55,
+    fahrenheitValue: 200
+  };
+
+  onCelciusChange = celcius => {
+    this.setState({ celciusValue: celcius });
+  };
+
+  onFahrenheitChange = fahrenheit => {
+    this.setState({ fahrenheitValue: fahrenheit });
+  };
+
+  render() {
+    return (
+      <TemperatureConverter
+        initialState={this.state}
+        celciusValue={this.state.celciusValue}
+        onCelciusValueChange={this.onCelciusChange}
+        fahrenheitValue={this.state.fahrenheitValue}
+        onFahrenheitValueChange={this.onFahrenheitChange}
+      />
+    );
+  }
+}

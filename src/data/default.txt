@@ -1,0 +1,11 @@
+/*
+ * If a component is uncontrolled, but the user wishes to supply a defaultValue, simply
+ * supply a defaultPropName, e.g. defaultCelciusValue, for those values. 
+ * A controlled component will throw a console error if a default value is also supplied. 
+ * This behaves the same as the React <input />. 
+ */
+
+<TemperatureConverter
+  defaultCelciusValue={55}
+  defaultFahrenheitValue={131} 
+/>

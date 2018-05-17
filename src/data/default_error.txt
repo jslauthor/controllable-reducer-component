@@ -1,0 +1,12 @@
+/* 
+ * NOTE: Please open your console to see the warning. 
+ * If a parent component supplies a default value and a controlled value or handler, it will
+ * display a console error.
+ */
+
+<TemperatureConverter
+  // has celciusValue and defaultCelciusValue 😱
+  celciusValue={200}
+  defaultCelciusValue={55}
+  onCelciusValueChange={someHandler}
+/>
