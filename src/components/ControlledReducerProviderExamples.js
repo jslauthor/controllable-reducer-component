@@ -37,7 +37,8 @@ const {
   DEFAULT_VALUE_ERROR,
   MISSING_HANDLER_ERROR,
   CONTROL_REVERT_ERROR,
-  SIMPLE_VALUE
+  SIMPLE_VALUE,
+  WELCOME
 } = stateObj;
 
 const StyledButton = styled.span`
@@ -72,12 +73,6 @@ const TemperatureConverterContainer = styled(FlexRow)`
     font-style: italic;
   }
 
-  a {
-    font-size: 12px;
-    text-decoration: none;
-    color: #333;
-  }
-
   a: hover {
     color: #888;
   }
@@ -87,6 +82,12 @@ const NavigationSection = styled(FlexColumn)`
   background-color: #eee;
   padding: 5px;
   width: 200px;
+
+  a {
+    font-size: 12px;
+    text-decoration: none;
+    color: #333;
+  }
 `;
 
 const ExampleContainer = styled(FlexColumn)`
@@ -99,7 +100,7 @@ const CodeContainer = styled(FlexColumn)`
   width: 100%;
   border-left: 2px solid grey;
   padding: 0px 10px;
-  background-color: #AAA;
+  background-color: #aaa;
   color: white;
 `;
 
@@ -108,7 +109,7 @@ const ConsoleContainer = styled(FlexColumn)`
   min-height: 200px;
   color: red;
   padding: 5px;
-`
+`;
 class FullyControlledTemperatureConverter extends React.Component {
   state = {
     celciusValue: 55,
@@ -152,7 +153,7 @@ const ExampleTemplate = ({
       <h4>Live Example</h4>
       {exampleComponent}
       <h4>Console Output</h4>
-      <ConsoleContainer id="__debug_output"></ConsoleContainer>
+      <ConsoleContainer id="__debug_output" />
     </ExampleContainer>
   );
 };
@@ -202,11 +203,19 @@ class ControlRevertTemperatureConverter extends React.Component {
 }
 
 const getCodeSampleForState = state => {
+  if (state === WELCOME) {
+    return null;
+  }
+
   let codeSample =
     state === SIMPLE_VALUE ? simpleValueComponentRaw : temperatureConverterRaw;
   return (
     <CodeContainer>
-      <h3>{state === SIMPLE_VALUE ? 'Simple Value Component Code (used to the left)' : 'Temperature Converter Code (used to the left)'}</h3>
+      <h3>
+        {state === SIMPLE_VALUE
+          ? "Simple Value Component Code (used to the left)"
+          : "Temperature Converter Code (used to the left)"}
+      </h3>
       <SyntaxHighlighter language="javascript" style={prism}>
         {codeSample}
       </SyntaxHighlighter>
@@ -216,6 +225,57 @@ const getCodeSampleForState = state => {
 
 const getComponentForState = state => {
   switch (state) {
+    case WELCOME:
+      return (
+        <ExampleContainer>
+          <h2>Welcome!</h2>
+          <p>
+            This project contains several examples of ControlledReducerProvider
+            and is meant to read along with <a href="">this RFC</a>. I encourage
+            you to read through the code samples for&nbsp;
+            <a
+              href="/src/providers/ControllableReducerProvider.html"
+              target="_blank"
+            >
+              ControllableReducerProvider,&nbsp;
+            </a>
+            <a href="/src/components/TemperatureConverter.html" target="_blank">
+              TemperatureConverter, &nbsp;
+            </a>
+            <a href="/src/components/SimpleValueComponent.html" target="_blank">
+              SimpleValueComponent
+            </a>, but you can just skip ahead to the TemperatureConverter
+            Autonomous example to see it in action.
+          </p>
+          <h3>The Skinny</h3>
+          <p>ControlledReducerProvider provides the following API:</p>
+          <ul>
+            <li>A reducer to manage internal state</li>
+            <li>A mechanism to reconcile incoming props with internal state</li>
+            <li>A means to define which props will be made public</li>
+            <li>
+              Leverage our existing Flux patterns, but at the component level
+            </li>
+          </ul>
+          <p>
+            In order for a parent to take "control" of a component, it must
+            satisfy the following rules:
+          </p>
+          <ul>
+            <li>
+              For every controlled value, the parent must supply the value and
+              an onValueChange handler that follows the same name titlecase
+              convention as the value, e.g. "someBigValue" would require an
+              "onSomeBigValueChange" handler.
+            </li>
+            <li>
+              OR, the parent must supply a default value (or none at all for
+              full autonomy)
+            </li>
+          </ul>
+          <h4>Have fun exploring the RFC and this example app!</h4>
+        </ExampleContainer>
+      );
     case AUTONOMOUS:
       return (
         <ExampleTemplate

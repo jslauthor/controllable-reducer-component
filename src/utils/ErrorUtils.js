@@ -6,8 +6,7 @@ import { getControlledProps } from "./ReducerProviderUtils";
 const dangerouslyOutputToDebugConsole = (string) => 
   document.getElementById(
     "__debug_output"
-  ).innerHTML += string + '</br></br>';
-
+  ).innerHTML += '> [CONSOLE WARNING] ' + string + '</br></br>';
 
 export const invariantForMissingAndDefaultProps = weakMemo(
   props => ({ controlledPropsFlags }) => {

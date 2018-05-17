@@ -8,6 +8,7 @@ const ON_EXIT = "onExit";
 
 /* States */
 
+const WELCOME = "WELCOME";
 const AUTONOMOUS = "AUTONOMOUS";
 const FULLY_CONTROLLED = "FULLY_CONTROLLED";
 const PARTIALLY_CONTROLLED = "PARTIALLY_CONTROLLED";
@@ -18,8 +19,6 @@ const CONTROL_REVERT_ERROR = "CONTROL_REVERT_ERROR";
 
 const SIMPLE_VALUE = "SIMPLE_VALUE";
 
-// TODO: Have a welcome page
-// TODO: Show console output in app
 // TODO: Add tests with React Testing Library
 // TODO: Add flow types
 // TODO: Add internalState?
@@ -27,6 +26,7 @@ const SIMPLE_VALUE = "SIMPLE_VALUE";
 /* states */
 
 export const states = [
+  WELCOME,
   AUTONOMOUS,
   FULLY_CONTROLLED,
   PARTIALLY_CONTROLLED,
@@ -52,7 +52,7 @@ const defaultRoutesAndLogic = {
 /* Chart */
 
 export const chart = {
-  initial: AUTONOMOUS,
+  initial: WELCOME,
   states: states.reduce(
     (acc, route) => ({ ...acc, ...{ [route]: defaultRoutesAndLogic } }),
     {}
@@ -64,6 +64,7 @@ export const chart = {
 export const logic = {
   clearConsole: (state, payload) => {
     console.clear();
-    document.getElementById("__debug_output").innerHTML = '';
+    const element = document.getElementById("__debug_output");
+    if (element) element.innerHTML = "";
   }
 };
