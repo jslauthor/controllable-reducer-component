@@ -231,7 +231,7 @@ const getComponentForState = state => {
           <h2>Welcome!</h2>
           <p>
             This project contains several examples of ControlledReducerProvider
-            and is meant to read along with <a href="">this RFC</a>. I encourage
+            and is meant to accompany <a href="">this RFC</a>. I encourage
             you to read through the code samples for&nbsp;
             <a
               href="/src/providers/ControllableReducerProvider.html"
