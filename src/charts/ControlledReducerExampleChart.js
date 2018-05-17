@@ -64,5 +64,6 @@ export const chart = {
 export const logic = {
   clearConsole: (state, payload) => {
     console.clear();
+    document.getElementById("__debug_output").innerHTML = '';
   }
 };

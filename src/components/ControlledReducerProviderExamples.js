@@ -98,9 +98,17 @@ const ExampleContainer = styled(FlexColumn)`
 const CodeContainer = styled(FlexColumn)`
   width: 100%;
   border-left: 2px solid grey;
-  padding-left: 10px;
+  padding: 0px 10px;
+  background-color: #AAA;
+  color: white;
 `;
 
+const ConsoleContainer = styled(FlexColumn)`
+  border: 1px solid grey;
+  min-height: 200px;
+  color: red;
+  padding: 5px;
+`
 class FullyControlledTemperatureConverter extends React.Component {
   state = {
     celciusValue: 55,
@@ -143,6 +151,8 @@ const ExampleTemplate = ({
       </SyntaxHighlighter>
       <h4>Live Example</h4>
       {exampleComponent}
+      <h4>Console Output</h4>
+      <ConsoleContainer id="__debug_output"></ConsoleContainer>
     </ExampleContainer>
   );
 };
