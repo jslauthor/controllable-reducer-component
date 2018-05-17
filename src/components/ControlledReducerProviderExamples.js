@@ -15,6 +15,8 @@ import {
 import TemperatureConverter from "./TemperatureConverter";
 import SimpleValueComponent from "./SimpleValueComponent";
 
+import autonomousTxt from '../data/autonomous.txt';
+
 registerLanguage("jsx", jsx);
 
 const {
@@ -120,11 +122,12 @@ const ExampleTemplate = ({
       <h6>* Please open your development console to see warnings</h6>
       <h3>{title}</h3>
       <div>{description}</div>
-      {exampleComponent}
       <h4>Code Sample</h4>
       <SyntaxHighlighter language="javascript" style={prism}>
         {codeSample}
       </SyntaxHighlighter>
+      <h4>Live Example</h4>
+      {exampleComponent}
     </ExampleContainer>
   );
 };
@@ -178,14 +181,9 @@ const getComponentForState = state => {
     case AUTONOMOUS:
       return (
         <ExampleTemplate
-          title="Autonomous"
-          description={`This is an autonomous component and can operate without any incoming
-          props. It is "uncontrolled". The state is managed within the
-          familiar reducer pattern inside TemperatureConverter. A parent can
-          override celciusValue and fahrenheitValue as demonstrated in the following
-          examples.`}
+          title="Autonomous (Just Works™) Example"
           exampleComponent={<TemperatureConverter key="autonomous" />}
-          codeSample={`<TemperatureConverter />`}
+          codeSample={autonomousTxt}
         />
       );
     case FULLY_CONTROLLED:
