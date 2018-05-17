@@ -7,5 +7,5 @@
 <TemperatureConverter
   celciusValue={55}
   fahrenheitValue={200}
-  // missing onCelciusValueChange and onFahrenheightValueChange
+  // missing onCelciusValueChange and onFahrenheightValueChange!
 />

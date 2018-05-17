@@ -1,0 +1,69 @@
+// Actions
+
+const INPUT_CHANGED = "INPUT_CHANGED";
+
+const inputChanged = event => {
+  return {
+    type: INPUT_CHANGED,
+    payload: event.currentTarget.value
+  };
+};
+
+// Reducer to handle the input. Now that value is controlled, you can add anything you want to it
+// For instance, we set error to true if the input contains anything other than a valid number
+
+const reducer = (
+  state = { value: { stringValue: "", error: false } },
+  action
+) => {
+  // Could use our match (Flow) API here
+  switch (action.type) {
+    case "INIT": {
+      const { value } = state;
+      return {
+        value
+      };
+    }
+    case INPUT_CHANGED: {
+      return {
+        // We can check if this value is controlled or not and do what we wish
+        value: {
+          stringValue: action.payload,
+          error: isNaN(Number(action.payload))
+        }
+      };
+    }
+    default: {
+      return state;
+    }
+  }
+};
+
+// Create a single value to store all of the component's state
+
+const controlledProps = ["value"];
+
+class SimpleValueComponent extends React.Component {
+  render() {
+    return (
+      <ControllableReducerProvider
+        reducer={reducer}
+        controlledProps={controlledProps}
+        {...this.props}
+      >
+        {({ dispatch, value: { stringValue, error }, defaultValue }) => {
+          return (
+            <InputContainer error={error}>
+              <span>Type in a numeric value</span>
+              <input
+                value={stringValue}
+                defaultValue={getDefaultStringValue(defaultValue)}
+                onChange={makeHandler(dispatch)(inputChanged)}
+              />
+            </InputContainer>
+          );
+        }}
+      </ControllableReducerProvider>
+    );
+  }
+}

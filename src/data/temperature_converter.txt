@@ -1,0 +1,111 @@
+// Create the actions for the reducer [can be included in another file]
+
+const CELCIUS_INPUT_CHANGED = "CELCIUS_INPUT_CHANGED";
+const FAHRENHEIT_INPUT_CHANGED = "FAHRENHEIT_INPUT_CHANGED";
+
+const celciusInputChanged = event => {
+  return {
+    type: CELCIUS_INPUT_CHANGED,
+    payload: event.currentTarget.value
+  };
+};
+
+const fahrenheitInputChanged = event => {
+  return {
+    type: FAHRENHEIT_INPUT_CHANGED,
+    payload: event.currentTarget.value
+  };
+};
+
+// The reducer used to manage the internal and external state with the component
+// [can be included in another file]
+
+const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
+  switch (action.type) {
+    case "INIT": {
+      const { celciusValue } = state;
+      return {
+        celciusValue,
+        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
+    case CELCIUS_INPUT_CHANGED: {
+      const { fahrenheitValue } = state;
+      const celciusValue = action.payload;
+      // Here we check if a particular prop is under the control of the parent.
+      // If it is, we don't change the value
+      const { controlledProps } = action.metadata;
+      return {
+        celciusValue,
+        fahrenheitValue: controlledProps.includes("fahrenheitValue")
+          ? fahrenheitValue
+          : convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
+    case FAHRENHEIT_INPUT_CHANGED: {
+      const { celciusValue } = state;
+      const fahrenheitValue = action.payload;
+      const { controlledProps } = action.metadata;
+      return {
+        celciusValue: controlledProps.includes("celciusValue")
+          ? celciusValue
+          : convertFahrenheitToCelsius(fahrenheitValue),
+        fahrenheitValue
+      };
+    }
+    default: {
+      return state;
+    }
+  }
+};
+
+// Define which props are "controllable".
+// This is similar to syncPropsToState's schemaKeys, except the reducer updates state instead of updater functions
+
+const controlledProps = ["celciusValue", "fahrenheitValue"];
+
+// Compose ControllableReducerProvider, Container, and inputs
+
+class TemperatureConverter extends React.Component {
+  render() {
+    return (
+      <ControllableReducerProvider
+        reducer={reducer}
+        controlledProps={controlledProps}
+        {...this.props}
+      >
+        {({
+          dispatch,
+          celciusValue,
+          defaultCelciusValue,
+          fahrenheitValue,
+          defaultFahrenheitValue
+        }) => {
+          return (
+            <TemperatureContainer>
+              <div>Input a temperature</div>
+              <InputContainer
+                wrongResult={
+                  !isConversionCorrect(celciusValue, fahrenheitValue)
+                }
+              >
+                <input
+                  value={celciusValue}
+                  defaultValue={defaultCelciusValue}
+                  onChange={makeHandler(dispatch)(celciusInputChanged)}
+                />
+                <span>Celcius =</span>
+                <input
+                  value={fahrenheitValue}
+                  defaultValue={defaultFahrenheitValue}
+                  onChange={makeHandler(dispatch)(fahrenheitInputChanged)}
+                />
+                <span>Fahrenheit</span>
+              </InputContainer>
+            </TemperatureContainer>
+          );
+        }}
+      </ControllableReducerProvider>
+    );
+  }
+}

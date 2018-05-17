@@ -19,8 +19,6 @@ const CONTROL_REVERT_ERROR = "CONTROL_REVERT_ERROR";
 const SIMPLE_VALUE = "SIMPLE_VALUE";
 
 // TODO: Have a welcome page
-// TODO: Move all comments into code samples
-// TODO: Add a split page with code for the original component demonstrated on the left
 // TODO: Show console output in app
 // TODO: Add tests with React Testing Library
 // TODO: Add flow types

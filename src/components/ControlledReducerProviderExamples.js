@@ -6,7 +6,7 @@ import SyntaxHighlighter, {
 import jsx from "react-syntax-highlighter/languages/prism/jsx";
 import prism from "react-syntax-highlighter/styles/prism/prism";
 import { makeHandler } from "../utils/StatechartUtils";
-import { titleCase } from '../utils/StringUtils';
+import { titleCase } from "../utils/StringUtils";
 import StatechartProvider from "../providers/StatechartProvider";
 import {
   chart,
@@ -16,13 +16,16 @@ import {
 import TemperatureConverter from "./TemperatureConverter";
 import SimpleValueComponent from "./SimpleValueComponent";
 
-import autonomousTxt from '../data/autonomous.txt';
-import fullyTxt from '../data/fully.txt';
-import partialTxt from '../data/partial.txt';
-import controlTxt from '../data/control.txt';
-import defaultTxt from '../data/default.txt';
-import defaultErrorTxt from '../data/default_error.txt';
-import missingHandlerTxt from '../data/missing.txt';
+import autonomousTxt from "../data/autonomous.txt";
+import fullyTxt from "../data/fully.txt";
+import partialTxt from "../data/partial.txt";
+import controlTxt from "../data/control.txt";
+import defaultTxt from "../data/default.txt";
+import defaultErrorTxt from "../data/default_error.txt";
+import missingHandlerTxt from "../data/missing.txt";
+
+import temperatureConverterRaw from "../data/temperature_converter.txt";
+import simpleValueComponentRaw from "../data/simple_value.txt";
 
 registerLanguage("jsx", jsx);
 
@@ -60,8 +63,7 @@ const FlexColumn = styled.div`
 
 const TemperatureConverterContainer = styled(FlexRow)`
   height: 100%;
-  width; 100%;
-  max-width: 800px;
+  width: 100%;
 
   h6 {
     margin: 0;
@@ -89,6 +91,14 @@ const NavigationSection = styled(FlexColumn)`
 
 const ExampleContainer = styled(FlexColumn)`
   padding: 10px;
+  max-width: 800px;
+  width: 100%;
+`;
+
+const CodeContainer = styled(FlexColumn)`
+  width: 100%;
+  border-left: 2px solid grey;
+  padding-left: 10px;
 `;
 
 class FullyControlledTemperatureConverter extends React.Component {
@@ -181,6 +191,19 @@ class ControlRevertTemperatureConverter extends React.Component {
   }
 }
 
+const getCodeSampleForState = state => {
+  let codeSample =
+    state === SIMPLE_VALUE ? simpleValueComponentRaw : temperatureConverterRaw;
+  return (
+    <CodeContainer>
+      <h3>{state === SIMPLE_VALUE ? 'Simple Value Component Code (used to the left)' : 'Temperature Converter Code (used to the left)'}</h3>
+      <SyntaxHighlighter language="javascript" style={prism}>
+        {codeSample}
+      </SyntaxHighlighter>
+    </CodeContainer>
+  );
+};
+
 const getComponentForState = state => {
   switch (state) {
     case AUTONOMOUS:
@@ -247,7 +270,7 @@ const getComponentForState = state => {
     case MISSING_HANDLER_ERROR:
       return (
         <ExampleTemplate
-          title="Missing Handler Error"
+          title="Missing Handler Error TemperatureConverter Example"
           exampleComponent={
             <TemperatureConverter
               key="missingHandlerError"
@@ -261,7 +284,7 @@ const getComponentForState = state => {
     case SIMPLE_VALUE:
       return (
         <ExampleTemplate
-          title="Simple Value Input"
+          title="Simple Value Input Example"
           description={`This component encapsulates all state within a single value prop
       `}
           exampleComponent={<SimpleValueComponent />}
@@ -273,7 +296,11 @@ const getComponentForState = state => {
   }
 };
 
-const titleize = str => str.split('_').map(titleCase).join(' ');
+const titleize = str =>
+  str
+    .split("_")
+    .map(titleCase)
+    .join(" ");
 
 // We'll use David K's xstate library to control the visual states
 // Expect a future RFC that details this 🙋
@@ -336,6 +363,7 @@ const ControlledReducerExampleContainer = props => (
             // Get preconfigured TemperatureConverter based on state
           */}
           {getComponentForState(machineState.value)}
+          {getCodeSampleForState(machineState.value)}
         </TemperatureConverterContainer>
       );
     }}
