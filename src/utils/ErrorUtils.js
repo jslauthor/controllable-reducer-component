@@ -3,10 +3,12 @@ import { getChangeHandler, getDefaultName, sentenceJoin } from "./StringUtils";
 import { weakMemo } from "./MemoizationUtils";
 import { getControlledProps } from "./ReducerProviderUtils";
 
-const dangerouslyOutputToDebugConsole = (string) => 
-  document.getElementById(
-    "__debug_output"
-  ).innerHTML += '> [CONSOLE WARNING] ' + string + '</br></br>';
+const dangerouslyOutputToDebugConsole = string => {
+  const element = document.getElementById("__debug_output");
+  if (element) {
+    element.innerHTML += "> [CONSOLE WARNING] " + string + "</br></br>";
+  }
+};
 
 export const invariantForMissingAndDefaultProps = weakMemo(
   props => ({ controlledPropsFlags }) => {
@@ -35,7 +37,11 @@ export const invariantForMissingAndDefaultProps = weakMemo(
 
     // THIS IS JUST FOR DEMONSTRATION PURPOSES!
     if (missingHandlers.length !== 0) {
-      dangerouslyOutputToDebugConsole(`To take control over this component, Controllable requires ${sentenceJoin(missingHandlers)}!`);
+      dangerouslyOutputToDebugConsole(
+        `To take control over this component, Controllable requires ${sentenceJoin(
+          missingHandlers
+        )}!`
+      );
     }
 
     const conflictingDefaults = controlledProps.reduce(
@@ -64,12 +70,12 @@ export const invariantForMissingAndDefaultProps = weakMemo(
 
     // THIS IS JUST FOR DEMONSTRATION PURPOSES!
     if (conflictingDefaults[0].length !== 0) {
-      dangerouslyOutputToDebugConsole(`Controllable components require a controlled prop or a default prop, but not both.` +
-        ` Select either ${sentenceJoin(
-          conflictingDefaults[0]
-        )}, or ${sentenceJoin(
-          conflictingDefaults[1]
-        )} for this component!`);
+      dangerouslyOutputToDebugConsole(
+        `Controllable components require a controlled prop or a default prop, but not both.` +
+          ` Select either ${sentenceJoin(
+            conflictingDefaults[0]
+          )}, or ${sentenceJoin(conflictingDefaults[1])} for this component!`
+      );
     }
 
     if (missingHandlers.length !== 0 || conflictingDefaults[0].length !== 0) {
@@ -90,7 +96,9 @@ export const invariantForControlChange = (
     );
 
     if (nextProps[key] === undefined) {
-      dangerouslyOutputToDebugConsole(`A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`);
+      dangerouslyOutputToDebugConsole(
+        `A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`
+      );
     }
 
     return nextProps[key] === undefined;
