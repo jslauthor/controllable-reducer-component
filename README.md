@@ -6,6 +6,23 @@
 
 Please visit this [demo site](https://ui-standards-dklghlulig.now.sh/) for demos, code samples, and docco docs.
 
+### The Skinny
+
+ControlledReducerProvider provides the following API:
+
+*   A reducer to manage internal state
+*   A mechanism to reconcile incoming props with internal state
+*   A means to define which props will be made public
+*   Leverage our existing Flux patterns at the component level
+*   Rules for taking "control" of a prop
+
+In order for a parent to take "control" of a component, it must satisfy the following rules:
+
+*   For every controlled value, the parent must supply the value and an onValueChange handler that follows the same name titlecase convention as the value, e.g. "someBigValue" would require an "onSomeBigValueChange" handler.
+*   OR, the parent must supply a default value (or none at all for full autonomy)
+
+#### Have fun exploring the RFC and this example app!
+
 # Motivation
 
 This is the first of many RFCs that will define our UI Standards. I've begun
