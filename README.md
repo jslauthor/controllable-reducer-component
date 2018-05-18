@@ -4,7 +4,7 @@
 
 # Summary
 
-Please visit this [demo site](https://ui-standards-dklghlulig.now.sh/) for demos, code samples, and docco docs.
+Please visit this [demo site](https://ui-standards-gsijfdeaxz.now.sh/) for demos, code samples, and docco docs.
 
 ### The Skinny
 
