@@ -266,7 +266,7 @@ const getComponentForState = state => {
               For every controlled value, the parent must supply the value and
               an onValueChange handler that follows the same name titlecase
               convention as the value, e.g. "someBigValue" would require an
-              "onSomeBigValueChange" handler.
+              "someBigValueChange" handler.
             </li>
             <li>
               OR, the parent must supply a default value (or none at all for

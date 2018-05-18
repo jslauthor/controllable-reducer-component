@@ -95,7 +95,7 @@ class ControllableReducerProvider extends React.Component {
     return this.props.children({
       // Assign this first so that the parent can override it in the props
       dispatch: this.dispatch,
-      ...getReducedState({ ...this.props, ...this.state.reducerState }),
+      ...getReducedState(this.props, this.state),
       ...getControlledMetadata(this.state)
     });
   }

@@ -63,7 +63,9 @@ controlledPropsFlags contains the keys of properties that have received a define
             
             <div class="content"><div class='highlight'><pre>  state = {
     <span class="hljs-attr">reducerState</span>: {},
-    <span class="hljs-attr">controlledPropsFlags</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>()
+    <span class="hljs-attr">controlledPropsFlags</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Set</span>(),
+    <span class="hljs-attr">didWarnForControlChange</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">didWarnForMissingAndDefaultProps</span>: <span class="hljs-literal">false</span>
   };</pre></div></div>
             
         </li>
@@ -119,7 +121,7 @@ controlledPropsFlags contains the keys of properties that have received a define
         state.controlledPropsFlags = state.controlledPropsFlags.add(key);
       }
       <span class="hljs-keyword">const</span> keyIsControlled = state.controlledPropsFlags.has(key);
-      <span class="hljs-keyword">if</span> (keyIsControlled) {</pre></div></div>
+      <span class="hljs-keyword">if</span> (keyIsControlled &amp;&amp; !state.didWarnForControlChange) {</pre></div></div>
             
         </li>
         
@@ -134,7 +136,11 @@ controlledPropsFlags contains the keys of properties that have received a define
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        invariantForControlChange(state.reducerState, nextProps, key);
+            <div class="content"><div class='highlight'><pre>        state.didWarnForControlChange = invariantForControlChange(
+          state.reducerState,
+          nextProps,
+          key
+        );
       }</pre></div></div>
             
         </li>
@@ -162,8 +168,10 @@ will expect the reducer to handle merging via action.metadata.props</p>
       }
       <span class="hljs-keyword">return</span> state;
     }, prevState);
-    <span class="hljs-keyword">if</span> (nextProps != <span class="hljs-literal">null</span>) {
-      invariantForMissingAndDefaultProps(nextProps)(derivedState);
+    <span class="hljs-keyword">if</span> (nextProps != <span class="hljs-literal">null</span> &amp;&amp; !derivedState.didWarnForMissingAndDefaultProps) {
+      derivedState.didWarnForMissingAndDefaultProps = invariantForMissingAndDefaultProps(
+        nextProps
+      )(derivedState);
     }
     <span class="hljs-keyword">return</span> derivedState;
   };
@@ -247,7 +255,7 @@ change handlers if a change occurred</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      dispatch: <span class="hljs-keyword">this</span>.dispatch,
-      ...getReducedState({ ...this.props, ...this.state.reducerState }),
+      ...getReducedState(<span class="hljs-keyword">this</span>.props, <span class="hljs-keyword">this</span>.state),
       ...getControlledMetadata(<span class="hljs-keyword">this</span>.state)
     });
   }

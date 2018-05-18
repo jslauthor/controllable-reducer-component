@@ -8,15 +8,14 @@ import ControllableReducerProvider from "../providers/ControllableReducerProvide
 
 const TemperatureContainer = styled.div`
   margin-top: 20px;
-  border: 1px solid #CCC;
+  border: 1px solid #ccc;
   padding: 10px;
   div {
     margin-bottom: 10px;
     font-size: 12px;
     font-style: italic;
-
   }
-`
+`;
 
 const InputContainer = styled.section`
   display: flex;
@@ -118,6 +117,38 @@ const controlledProps = ["celciusValue", "fahrenheitValue"];
 
 // Compose ControllableReducerProvider, Container, and inputs
 
+const getCelciusProps = state => {
+  const {
+    celciusValue,
+    defaultCelciusValue,
+    dispatch
+  } = state;
+  if (defaultCelciusValue !== undefined) {
+    return { defaultValue: defaultCelciusValue };
+  } else {
+    return {
+      value: celciusValue,
+      onChange: makeHandler(dispatch)(celciusInputChanged)
+    };
+  }
+};
+
+const getFahrenheitProps = state => {
+  const {
+    fahrenheitValue,
+    defaultFahrenheitValue,
+    dispatch
+  } = state;
+  if (defaultFahrenheitValue !== undefined) {
+    return { defaultValue: defaultFahrenheitValue };
+  } else {
+    return {
+      value: fahrenheitValue,
+      onChange: makeHandler(dispatch)(fahrenheitInputChanged)
+    };
+  }
+};
+
 class TemperatureConverter extends React.Component {
   render() {
     return (
@@ -126,13 +157,8 @@ class TemperatureConverter extends React.Component {
         controlledProps={controlledProps}
         {...this.props}
       >
-        {({
-          dispatch,
-          celciusValue,
-          defaultCelciusValue,
-          fahrenheitValue,
-          defaultFahrenheitValue
-        }) => {
+        {state => {
+          const {celciusValue, fahrenheitValue} = state;
           return (
             <TemperatureContainer>
               <div>Input a temperature</div>
@@ -141,17 +167,9 @@ class TemperatureConverter extends React.Component {
                   !isConversionCorrect(celciusValue, fahrenheitValue)
                 }
               >
-                <input
-                  value={celciusValue}
-                  defaultValue={defaultCelciusValue}
-                  onChange={makeHandler(dispatch)(celciusInputChanged)}
-                />
+                <input {...getCelciusProps(state)} />
                 <span>Celcius =</span>
-                <input
-                  value={fahrenheitValue}
-                  defaultValue={defaultFahrenheitValue}
-                  onChange={makeHandler(dispatch)(fahrenheitInputChanged)}
-                />
+                <input {...getFahrenheitProps(state)} />
                 <span>Fahrenheit</span>
               </InputContainer>
             </TemperatureContainer>

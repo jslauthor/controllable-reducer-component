@@ -1,4 +1,4 @@
-import { getChangeHandler, getDefaultName } from "./StringUtils";
+// import { getChangeHandler, getDefaultName } from "./StringUtils";
 import { weakMemo } from "./MemoizationUtils";
 import { arr } from "./FunctionUtils";
 
@@ -17,16 +17,16 @@ export const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
   };
 });
 
-// If we have a default value and the reducer supplied default state, we must delete it for components
-// like <input /> that don't also follow the rule of "no value allowed if there is a default value"
-
-export const getReducedState = state => {
-  getControlledProps(state).forEach(key => {
-    const changeHandlerName = getChangeHandler(key);
-    if (state[getDefaultName(key)]) {
-      delete state[key];
-      delete state[changeHandlerName];
-    }
-  });
-  return state;
+// This merges the props, reducer state, and controlled props' values 
+// in that precedence (controlled always overrides reducer, which overrides props)
+export const getReducedState = (props, state) => {
+  const { controlledPropsFlags, reducerState } = state;
+  const controlledPropsValues = Array.from(controlledPropsFlags).reduce(
+    (values, key) => ({
+      ...values,
+      [key]: props[key]
+    }),
+    {}
+  );
+  return { ...props, ...reducerState, ...controlledPropsValues };
 };
