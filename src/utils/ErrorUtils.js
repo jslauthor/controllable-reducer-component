@@ -15,7 +15,7 @@ export const invariantForMissingAndDefaultProps = weakMemo(
       process.env.NODE_ENV === "production" ||
       (controlledProps.length === 0 || controlledPropsFlags.size === 0)
     ) {
-      return;
+      return false;
     }
 
     const missingHandlers = controlledProps.reduce((acc, prop) => {
@@ -71,6 +71,10 @@ export const invariantForMissingAndDefaultProps = weakMemo(
           conflictingDefaults[1]
         )} for this component!`);
     }
+
+    if (missingHandlers.length !== 0 || conflictingDefaults[0].length !== 0) {
+      return true;
+    }
   }
 );
 
@@ -88,5 +92,9 @@ export const invariantForControlChange = (
     if (nextProps[key] === undefined) {
       dangerouslyOutputToDebugConsole(`A component must remain controlled once a parent component supplies a managed property. The following property was under control, but now is no longer: ${key}`);
     }
+
+    return nextProps[key] === undefined;
   }
+
+  return false;
 };

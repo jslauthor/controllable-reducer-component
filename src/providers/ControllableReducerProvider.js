@@ -18,7 +18,9 @@ class ControllableReducerProvider extends React.Component {
   // controlledPropsFlags contains the keys of properties that have received a defined value
   state = {
     reducerState: {},
-    controlledPropsFlags: new Set()
+    controlledPropsFlags: new Set(),
+    didWarnForControlChange: false,
+    didWarnForMissingAndDefaultProps: false
   };
 
   // Hydrate the state with an INIT call to the reducer
@@ -37,9 +39,13 @@ class ControllableReducerProvider extends React.Component {
         state.controlledPropsFlags = state.controlledPropsFlags.add(key);
       }
       const keyIsControlled = state.controlledPropsFlags.has(key);
-      if (keyIsControlled) {
+      if (keyIsControlled && !state.didWarnForControlChange) {
         // Throw warning if parent relinquishes control of any property
-        invariantForControlChange(state.reducerState, nextProps, key);
+        state.didWarnForControlChange = invariantForControlChange(
+          state.reducerState,
+          nextProps,
+          key
+        );
       }
       // Assign incoming property to internal state. If props.autoMergeProps is false, the component
       // will expect the reducer to handle merging via action.metadata.props
@@ -54,8 +60,10 @@ class ControllableReducerProvider extends React.Component {
       }
       return state;
     }, prevState);
-    if (nextProps != null) {
-      invariantForMissingAndDefaultProps(nextProps)(derivedState);
+    if (nextProps != null && !derivedState.didWarnForMissingAndDefaultProps) {
+      derivedState.didWarnForMissingAndDefaultProps = invariantForMissingAndDefaultProps(
+        nextProps
+      )(derivedState);
     }
     return derivedState;
   };

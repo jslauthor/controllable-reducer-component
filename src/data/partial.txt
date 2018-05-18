@@ -2,6 +2,9 @@
  * This is partially controlled component. The parent manages only the celcius value.
  * Please notice how the component still updates the fahrenheit value when celcius changes, 
  * but when the fahrenheit value changes, celcius remains unchanged since it is "controlled."
+ *
+ * This will, in a sense, "break" the component, but it's demonstrating how a container
+ * can override a component's value.
 */
 
 class PartiallyControlledTemperatureConverter extends React.Component {
