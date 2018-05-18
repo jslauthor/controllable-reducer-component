@@ -78,9 +78,7 @@ export const invariantForMissingAndDefaultProps = weakMemo(
       );
     }
 
-    if (missingHandlers.length !== 0 || conflictingDefaults[0].length !== 0) {
-      return true;
-    }
+    return missingHandlers.length !== 0 || conflictingDefaults[0].length !== 0;
   }
 );
 
