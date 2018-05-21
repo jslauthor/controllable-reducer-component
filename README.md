@@ -6,6 +6,43 @@
 
 Please visit this [demo site](https://ui-standards-yxiyukydqa.now.sh/) for demos, code samples, and docco docs. Here is the demo's [Github repo](https://github.com/jslauthor/controllable-reducer-component).
 
+Here's a preview (for the full code and much more, visit the URL above)
+
+```jsx
+const controlledProps = ["celciusValue", "fahrenheitValue"];
+
+class TemperatureConverter extends React.Component {
+  render() {
+    return (
+      <ControllableReducerProvider
+        reducer={reducer}
+        controlledProps={controlledProps}
+        {...this.props}
+      >
+        {reducerState => {
+          const { celciusValue, fahrenheitValue } = reducerState;
+          return (
+            <TemperatureContainer>
+              <div>Input a temperature</div>
+              <InputContainer
+                wrongResult={
+                  !isConversionCorrect(celciusValue, fahrenheitValue)
+                }
+              >
+                <input {...getCelciusPropsAndMapDispatch(reducerState)} />
+                <span>Celcius =</span>
+                <input {...getCelciusPropsAndMapDispatch(reducerState)} />
+                <span>Fahrenheit</span>
+              </InputContainer>
+            </TemperatureContainer>
+          );
+        }}
+      </ControllableReducerProvider>
+    );
+  }
+}
+```
+
 ### The Skinny
 
 Ask yourself these questions: 
