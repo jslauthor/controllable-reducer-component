@@ -292,22 +292,22 @@ children and share state across them.
 
 ### API
 
-| prop              | type                                | Description                                                                                                                                                                            |
-| ----------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| initialState?     | object                              | The initial state from which to hydrate the reducer                                                                                                                                    |
-| reducer?          | (state, action) => state            | The reducer that generates the internal state                                                                                                                                          |
-| controlledProps   | string[]                            | An array of keys that are controllable. Think of them as "promote-able" to external state.                                                                                             |
-| autoMergeProps    | bool = true                         | Whether or not ControlledReducerProvider should merge the incoming props, or give the author manual control to do so in the reducer                                                    |
-| dispatch          | (...args) => void = this.dispatch   | The dispatch function which runs the action through the reducer and triggers setState inside the component                                                                             |
-| internalState?    | object                              | Supplying an external dispatch and internalState circumvents the reducer/setState cycle and give the parent component absolute control over all internal state [NOT IMPLEMENTATED YET] |
+| prop            | type                              | Description                                                                                                                                                                            |
+| --------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| initialState?   | object                            | The initial state from which to hydrate the reducer                                                                                                                                    |
+| reducer?        | (state, action) => state          | The reducer that generates the internal state                                                                                                                                          |
+| controlledProps | string[]                          | An array of keys that are controllable. Think of them as "promote-able" to external state. NOTE: They must be "root" keys on the reducer state.                                        |
+| autoMergeProps  | bool = true                       | Whether or not ControlledReducerProvider should merge the incoming props, or give the author manual control to do so in the reducer                                                    |
+| dispatch        | (...args) => void = this.dispatch | The dispatch function which runs the action through the reducer and triggers setState inside the component                                                                             |
+| internalState?  | object                            | Supplying an external dispatch and internalState circumvents the reducer/setState cycle and give the parent component absolute control over all internal state [NOT IMPLEMENTATED YET] |
 
 ### Action Metadata (data auto-appended to all actions)
 
-| action.metadata   | type           | Description                                                                                         |
-| ----------------- | -------------- | --------------------------------------------------------------------------------------------------- |
-| isControlled      | bool = false   | True is _any_ props are controlled in the component                                                 |
-| controlledProps   | string[]       | A list of keys that are under the parent's control. If no keys, then the component is autonomous.   |
-| props             | object         | The current props from the parent component (useful is autoMergeProps is false)                     |
+| action.metadata | type         | Description                                                                                       |
+| --------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| isControlled    | bool = false | True is _any_ props are controlled in the component                                               |
+| controlledProps | string[]     | A list of keys that are under the parent's control. If no keys, then the component is autonomous. |
+| props           | object       | The current props from the parent component (useful is autoMergeProps is false)                   |
 
 # Drawbacks
 

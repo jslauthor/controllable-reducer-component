@@ -6,7 +6,8 @@ import { getChangeHandler } from "../utils/StringUtils";
 import {
   getControlledProps,
   getControlledMetadata,
-  getReducedState
+  getReducedState,
+  getInitialState
 } from "../utils/ReducerProviderUtils";
 import {
   invariantForMissingAndDefaultProps,
@@ -26,9 +27,7 @@ class ControllableReducerProvider extends React.Component {
   // Hydrate the state with an INIT call to the reducer
   constructor(props) {
     super(props);
-    this.state.reducerState = this.props.reducer(this.props.initialState, {
-      type: "INIT"
-    });
+    this.state.reducerState = getInitialState(this.props);
   }
 
   // Use getDerivedStateFromProps to reconcile incoming props with internal state
