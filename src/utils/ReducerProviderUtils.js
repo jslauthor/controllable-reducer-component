@@ -31,6 +31,17 @@ export const getReducedState = (props, state) => {
   return { ...props, ...reducerState, ...controlledPropsValues };
 };
 
+
+var proto = Object.prototype;
+var gpo = Object.getPrototypeOf;
+
+const isPojo = (obj) => {
+  if (obj === null || typeof obj !== "object") {
+    return false;
+  }
+  return gpo(obj) === proto;
+}
+
 const INIT = { type: "INIT" };
 
 // getInitialState attempts to 1) use a provided initialState, 
@@ -42,6 +53,11 @@ export const getInitialState = weakMemo(props => {
     return reducer(initialState, INIT);
   }
   // Take the default state and merge the props into it
+  const reducerDefaultState = reducer(undefined, INIT);
+  if (!isPojo(reducerDefaultState)) {
+    throw new Error('ControlledReducerProvider reducers may only be of a plain javascript object type.');
+  }
+
   const mergedState = controlledProps.reduce((values, key) => {
     if (props[key] !== undefined) {
       values = values ? values : {};
@@ -52,7 +68,7 @@ export const getInitialState = weakMemo(props => {
     }
 
     return values;
-  }, reducer(undefined, INIT));
+  }, reducerDefaultState);
 
   // Use the merged props as the reducer's initial state
   return reducer(mergedState, INIT);
