@@ -112,8 +112,8 @@ const ConsoleContainer = styled(FlexColumn)`
 `;
 class FullyControlledTemperatureConverter extends React.Component {
   state = {
-    celciusValue: 55,
-    fahrenheitValue: 200
+    celciusValue: 0,
+    fahrenheitValue: 32
   };
 
   onCelciusChange = celcius => {
@@ -162,6 +162,8 @@ class PartiallyControlledTemperatureConverter extends React.Component {
     celciusValue: 55
   };
 
+  // Things get weird if you try and change this to a different value
+  // The two temperatures won't match -- I don't foresee this being an issue, though
   onCelciusChange = celcius => {
     this.setState({ celciusValue: celcius });
   };

@@ -70,36 +70,26 @@ const fahrenheitInputChanged = event => {
 // The reducer used to manage the internal and external state with the component
 // [can be included in another file]
 
-const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
+const reducer = (state = { celciusValue: 0, fahrenheitValue: 32 }, action) => {
   switch (action.type) {
     case "INIT": {
-      const { celciusValue } = state;
+      const { celciusValue } = state; // this could be smarter and see which value is available
       return {
         celciusValue,
         fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
       };
     }
     case CELCIUS_INPUT_CHANGED: {
-      const { fahrenheitValue } = state;
       const celciusValue = action.payload;
-      // Here we check if a particular prop is under the control of the parent.
-      // If it is, we don't change the value
-      const { controlledProps } = action.metadata;
       return {
         celciusValue,
-        fahrenheitValue: controlledProps.includes("fahrenheitValue")
-          ? fahrenheitValue
-          : convertCelsiusToFahrenheit(celciusValue)
+        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
       };
     }
     case FAHRENHEIT_INPUT_CHANGED: {
-      const { celciusValue } = state;
       const fahrenheitValue = action.payload;
-      const { controlledProps } = action.metadata;
       return {
-        celciusValue: controlledProps.includes("celciusValue")
-          ? celciusValue
-          : convertFahrenheitToCelsius(fahrenheitValue),
+        celciusValue: convertFahrenheitToCelsius(fahrenheitValue),
         fahrenheitValue
       };
     }
@@ -111,7 +101,8 @@ const reducer = (state = { celciusValue: 10, fahrenheitValue: 0 }, action) => {
 
 // Define which props are "controllable".
 // Can be typed in flow with $ElementType: https://flow.org/en/docs/types/utilities/#toc-elementtype
-// This is similar to syncPropsToState's schemaKeys, except the reducer updates state instead of updater functions
+// This is similar to syncPropsToState's schemaKeys, except the reducer 
+// updates the entire state instead of updater functions
 
 const controlledProps = ["celciusValue", "fahrenheitValue"];
 
@@ -121,32 +112,39 @@ const getCelciusProps = state => {
   const {
     celciusValue,
     defaultCelciusValue,
-    dispatch
+    dispatch,
+    controlledProps
   } = state;
-  if (defaultCelciusValue !== undefined) {
-    return { defaultValue: defaultCelciusValue };
-  } else {
+  if (
+    (celciusValue !== undefined && controlledProps.includes("celciusValue")) ||
+    defaultCelciusValue === undefined
+  ) {
     return {
       value: celciusValue,
       onChange: makeHandler(dispatch)(celciusInputChanged)
     };
   }
+  return { defaultValue: defaultCelciusValue };
 };
 
 const getFahrenheitProps = state => {
   const {
     fahrenheitValue,
     defaultFahrenheitValue,
-    dispatch
+    dispatch,
+    controlledProps
   } = state;
-  if (defaultFahrenheitValue !== undefined) {
-    return { defaultValue: defaultFahrenheitValue };
-  } else {
+  if (
+    (fahrenheitValue !== undefined &&
+      controlledProps.includes("fahrenheitValue")) ||
+    defaultFahrenheitValue === undefined
+  ) {
     return {
       value: fahrenheitValue,
       onChange: makeHandler(dispatch)(fahrenheitInputChanged)
     };
   }
+  return { defaultValue: defaultFahrenheitValue };
 };
 
 class TemperatureConverter extends React.Component {
@@ -158,7 +156,7 @@ class TemperatureConverter extends React.Component {
         {...this.props}
       >
         {state => {
-          const {celciusValue, fahrenheitValue} = state;
+          const { celciusValue, fahrenheitValue } = state;
           return (
             <TemperatureContainer>
               <div>Input a temperature</div>

@@ -18,7 +18,7 @@ export const getControlledMetadata = weakMemo(({ controlledPropsFlags }) => {
 });
 
 // This merges the props, reducer state, and controlled props' values 
-// in that precedence (controlled always overrides reducer, which overrides props)
+// in that order (controlled always overrides reducer, which overrides props)
 export const getReducedState = (props, state) => {
   const { controlledPropsFlags, reducerState } = state;
   const controlledPropsValues = Array.from(controlledPropsFlags).reduce(
