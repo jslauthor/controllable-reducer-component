@@ -1,6 +1,7 @@
 // import { getChangeHandler, getDefaultName } from "./StringUtils";
 import { weakMemo } from "./MemoizationUtils";
 import { arr } from "./FunctionUtils";
+import update from "immutability-helper";
 
 export const getSafeValue = weakMemo(
   value => (Array.isArray(value) && value) || arr
@@ -31,44 +32,53 @@ export const getReducedState = (props, state) => {
   return { ...props, ...reducerState, ...controlledPropsValues };
 };
 
+const proto = Object.prototype;
+const gpo = Object.getPrototypeOf;
 
-var proto = Object.prototype;
-var gpo = Object.getPrototypeOf;
-
-const isPojo = (obj) => {
+const isPojo = obj => {
   if (obj === null || typeof obj !== "object") {
     return false;
   }
   return gpo(obj) === proto;
-}
+};
 
 const INIT = { type: "INIT" };
 
-// getInitialState attempts to 1) use a provided initialState, 
-// or 2) merge any controlledProps values into the default reducer state
+const addKeyToState = (state = {}, key, value) =>
+  update(state, { $set: { [key]: value } });
+
+const getMergedState = (reducerDefaultState, props) => {
+  const { controlledProps } = props;
+  return controlledProps.reduce((values, key) => {
+    if (props[key] !== undefined) {
+      return addKeyToState(values, key, props[key]);
+    }
+    return values;
+  }, reducerDefaultState);
+};
+
+const throwIfNotPojo = state => {
+  if (!isPojo(state)) {
+    throw new Error(
+      "ControlledReducerProvider reducer state must be a plain JavaScript Object type."
+    );
+  }
+};
+
+// getInitialState attempts to 
+// 1) use a provided initialState,
+// Or, 2) merge any controlledProps values into the default reducer state
 export const getInitialState = weakMemo(props => {
-  const { initialState, controlledProps, reducer } = props;
+  const { initialState, reducer } = props;
   // If initialState exists, use it to hydrate the reducer
   if (initialState !== undefined) {
     return reducer(initialState, INIT);
   }
   // Take the default state and merge the props into it
   const reducerDefaultState = reducer(undefined, INIT);
-  if (!isPojo(reducerDefaultState)) {
-    throw new Error('ControlledReducerProvider reducers may only be of a plain javascript object type.');
-  }
+  throwIfNotPojo(reducerDefaultState);
 
-  const mergedState = controlledProps.reduce((values, key) => {
-    if (props[key] !== undefined) {
-      values = values ? values : {};
-      return {
-        ...values,
-        [key]: props[key]
-      };
-    }
-
-    return values;
-  }, reducerDefaultState);
+  const mergedState = getMergedState(reducerDefaultState, props);
 
   // Use the merged props as the reducer's initial state
   return reducer(mergedState, INIT);
