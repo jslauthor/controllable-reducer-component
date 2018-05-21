@@ -100,7 +100,6 @@ const reducer = (state = { celciusValue: 0, fahrenheitValue: 32 }, action) => {
 };
 
 // Define which props are "controllable".
-// Can be typed in flow with $ElementType: https://flow.org/en/docs/types/utilities/#toc-elementtype
 // This is similar to syncPropsToState's schemaKeys, except the reducer 
 // updates the entire state instead of updater functions
 

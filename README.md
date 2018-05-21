@@ -1,25 +1,38 @@
-* Start Date: 2018-04-09
+* Start Date: 2018-05-21
 * RFC PR: (to be filled with the RFC PR once opened)
 * Implementation PR: (to be filled with the RFC implementation PR once opened)
 
 # Summary
 
-Please visit this [demo site](https://ui-standards-gsijfdeaxz.now.sh/) for demos, code samples, and docco docs.
+Please visit this [demo site](https://ui-standards-yxiyukydqa.now.sh/) for demos, code samples, and docco docs. Here is the demo's [Github repo](https://github.com/jslauthor/controllable-reducer-component).
 
 ### The Skinny
 
-ControlledReducerProvider provides the following API:
+Ask yourself these questions: 
+
+* Do I need to maintain state to support some kind of behavior(s) in a component?
+* Do I need to record any of that state outside the component?
+
+If the answer is yes to both of those questions (it is often "yes" with reusable components), then `ControllableReducerProvider` could be a great choice.
+
+In short, `ControllableReducerProvider` is a container that wraps `N` number of children and produces their _state_ via a reducer and supplies that state with render props to its children. It creates _behavior_ via reducer actions, and it merges specified incoming "controllable" props that are used inside the reducer. 
+
+`ControlledReducerProvider` has
 
 *   A reducer to manage internal state
 *   A mechanism to reconcile incoming props with internal state
 *   A means to define which props will be made public
-*   Leverage our existing Flux patterns at the component level
+*   An API based our existing Flux patterns at the component level
 *   Rules for taking "control" of a prop
 
 In order for a parent to take "control" of a component, it must satisfy the following rules:
 
 *   For every controlled value, the parent must supply the value and an onValueChange handler that follows the same name titlecase convention as the value, e.g. "someBigValue" would require an "onSomeBigValueChange" handler.
 *   OR, the parent must supply a default value (or none at all for full autonomy)
+
+### How will we use this?
+
+I propose we use this pattern for our core components in the upcoming UI Infrastructure efforts and encode this into our UI Standards.
 
 #### Have fun exploring the RFC and this example app!
 
@@ -294,7 +307,7 @@ children and share state across them.
 
 | prop            | type                              | Description                                                                                                                                                                            |
 | --------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| initialState?   | object                            | The initial state from which to hydrate the reducer                                                                                                                                    |
+| initialState?   | object                            | The initial state from which to hydrate the reducer (advanced use only)                                                                                                                                   |
 | reducer?        | (state, action) => state          | The reducer that generates the internal state                                                                                                                                          |
 | controlledProps | string[]                          | An array of keys that are controllable. Think of them as "promote-able" to external state. NOTE: They must be "root" keys on the reducer state.                                        |
 | autoMergeProps  | bool = true                       | Whether or not ControlledReducerProvider should merge the incoming props, or give the author manual control to do so in the reducer                                                    |
