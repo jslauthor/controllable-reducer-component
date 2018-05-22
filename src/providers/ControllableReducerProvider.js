@@ -1,7 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import update from "immutability-helper";
-import { callFn } from "../utils/FunctionUtils";
+import { callFn, assoc } from "../utils/FunctionUtils";
 import { getChangeHandler } from "../utils/StringUtils";
 import {
   getControlledProps,
@@ -53,9 +52,7 @@ class ControllableReducerProvider extends React.Component {
         state.reducerState[key] !== nextProps[key] &&
         keyIsControlled
       ) {
-        state.reducerState = update(state.reducerState, {
-          $set: { [key]: nextProps[key] }
-        });
+        state.reducerState = assoc(key, nextProps[key], state.reducerState);
       }
       return state;
     }, prevState);

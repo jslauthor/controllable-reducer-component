@@ -1,7 +1,6 @@
 // import { getChangeHandler, getDefaultName } from "./StringUtils";
 import { weakMemo } from "./MemoizationUtils";
-import { arr } from "./FunctionUtils";
-import update from "immutability-helper";
+import { arr, assoc } from "./FunctionUtils";
 
 export const getSafeValue = weakMemo(
   value => (Array.isArray(value) && value) || arr
@@ -45,7 +44,7 @@ const isPojo = obj => {
 const INIT = { type: "INIT" };
 
 const addKeyToState = (state = {}, key, value) =>
-  update(state, { $set: { [key]: value } });
+  assoc(key, value, state);
 
 const getMergedState = (reducerDefaultState, props) => {
   const { controlledProps } = props;
