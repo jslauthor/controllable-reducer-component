@@ -37,6 +37,7 @@ class ControllableReducerProvider extends React.Component {
         state.controlledPropsFlags = state.controlledPropsFlags.add(key);
       }
       const keyIsControlled = state.controlledPropsFlags.has(key);
+      // TODO: Move this into componentDidUpdate?
       if (keyIsControlled && !state.didWarnForControlChange) {
         // Throw warning if parent relinquishes control of any property
         state.didWarnForControlChange = invariantForControlChange(
@@ -73,6 +74,8 @@ class ControllableReducerProvider extends React.Component {
     };
     // This updates the state using the reducer and calls all controlled
     // change handlers if a change occurred
+
+    //TODO: Need to merged in controlled props values here
     this.setState(
       { reducerState: this.props.reducer(this.state.reducerState, action) },
       () => {

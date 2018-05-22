@@ -43,14 +43,11 @@ const isPojo = obj => {
 
 const INIT = { type: "INIT" };
 
-const addKeyToState = (state = {}, key, value) =>
-  assoc(key, value, state);
-
 const getMergedState = (reducerDefaultState, props) => {
   const { controlledProps } = props;
   return controlledProps.reduce((values, key) => {
     if (props[key] !== undefined) {
-      return addKeyToState(values, key, props[key]);
+      assoc(key, props[key], values);
     }
     return values;
   }, reducerDefaultState);
