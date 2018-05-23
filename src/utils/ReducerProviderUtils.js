@@ -61,12 +61,6 @@ const throwIfNotPojo = state => {
   }
 };
 
-export const makeReducer = reducer => props => (state, action) => {
-  const mergedState = mergePropsWithState(props, state);
-  const reducedState = reducer(mergedState, action);
-  return mergePropsWithState(props, reducedState);
-}
-
 // getInitialState attempts to 
 // 1) use a provided initialState,
 // Or, 2) merge any controlledProps values into the default reducer state
