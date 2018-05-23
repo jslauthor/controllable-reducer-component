@@ -43,14 +43,14 @@ const isPojo = obj => {
 
 const INIT = { type: "INIT" };
 
-const getMergedState = (reducerDefaultState, props) => {
+const mergePropsWithState = (props, state) => {
   const { controlledProps } = props;
   return controlledProps.reduce((values, key) => {
     if (props[key] !== undefined) {
       assoc(key, props[key], values);
     }
     return values;
-  }, reducerDefaultState);
+  }, state);
 };
 
 const throwIfNotPojo = state => {
@@ -60,6 +60,12 @@ const throwIfNotPojo = state => {
     );
   }
 };
+
+export const makeReducer = reducer => props => (state, action) => {
+  const mergedState = mergePropsWithState(props, state);
+  const reducedState = reducer(mergedState, action);
+  return mergePropsWithState(props, reducedState);
+}
 
 // getInitialState attempts to 
 // 1) use a provided initialState,
@@ -74,8 +80,9 @@ export const getInitialState = weakMemo(props => {
   const reducerDefaultState = reducer(undefined, INIT);
   throwIfNotPojo(reducerDefaultState);
 
-  const mergedState = getMergedState(reducerDefaultState, props);
+  const mergedState = mergePropsWithState(props, reducerDefaultState);
 
   // Use the merged props as the reducer's initial state
   return reducer(mergedState, INIT);
 });
+
