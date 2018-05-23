@@ -70,16 +70,27 @@ const fahrenheitInputChanged = event => {
 // The reducer used to manage the internal and external state with the component
 // [can be included in another file]
 
-const reducer = (state = { value: { temp: 0, type: "C" } }, action) => {
+const reducer = (state = { celciusValue: 0, fahrenheitValue: 32 }, action) => {
   switch (action.type) {
-    case CELCIUS_INPUT_CHANGED: {
+    case "INIT": {
+      const { celciusValue } = state; // this could be smarter and see which value is available
       return {
-        value: { temp: action.payload, type: "C" }
+        celciusValue,
+        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
+      };
+    }
+    case CELCIUS_INPUT_CHANGED: {
+      const celciusValue = action.payload;
+      return {
+        celciusValue,
+        fahrenheitValue: convertCelsiusToFahrenheit(celciusValue)
       };
     }
     case FAHRENHEIT_INPUT_CHANGED: {
+      const fahrenheitValue = action.payload;
       return {
-        value: { temp: action.payload, type: "F" }
+        celciusValue: convertFahrenheitToCelsius(fahrenheitValue),
+        fahrenheitValue
       };
     }
     default: {
@@ -89,7 +100,7 @@ const reducer = (state = { value: { temp: 0, type: "C" } }, action) => {
 };
 
 // Define which props are "controllable".
-// This is similar to syncPropsToState's schemaKeys, except the reducer
+// This is similar to syncPropsToState's schemaKeys, except the reducer 
 // updates the entire state instead of updater functions
 
 const controlledProps = ["celciusValue", "fahrenheitValue"];
