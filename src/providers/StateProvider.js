@@ -29,7 +29,7 @@ const mergePropsWithState = controllableProps => (props, state) => {
 const checkForControlChange = (prevProps, nextProps) => key =>
   prevProps[key] !== undefined && nextProps[key] === undefined;
 
-const warnForControlChange = (prevProps, nextProps, state, keys) => {
+const warnForControlChange = (prevProps, nextProps, state = {}, keys) => {
   if (state[DID_WARN_FOR_CONTROL_CHANGE] === false) {
     return assoc(
       DID_WARN_FOR_CONTROL_CHANGE,
@@ -98,10 +98,10 @@ class StateProvider extends React.Component {
     emitStateChange(this.props, undefined, this.state[REDUCED_STATE])();
   }
 
-  // Lou, PROPS_UPDATED here would mean we'd need to emit a change event
-  // if the state changed
   static getDerivedStateFromProps = (nextProps, prevState) =>
-    mergePropsWithState(prevState[CONTROLLABLE_PROPS])(nextProps, prevState);
+    nextProps.autoMergeProps 
+      ? mergePropsWithState(prevState[CONTROLLABLE_PROPS])(nextProps, prevState)
+      : null;
 
   dispatch = action => {
     const previousState = this.state[REDUCED_STATE];
@@ -122,7 +122,7 @@ class StateProvider extends React.Component {
     const { children, defaultChildren } = this.props;
     const renderChildren = children || defaultChildren;
     return renderChildren({
-      ...(callFn(this.props.mapDispatchToHandlers, this.dispatch) || {}),
+      ...(callFn(this.props.mapDispatchToActions, this.dispatch) || {}),
       ...this.props,
       ...this.state[REDUCED_STATE]
     });
