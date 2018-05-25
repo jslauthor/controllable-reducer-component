@@ -104,3 +104,20 @@ export const invariantForControlChange = (
 
   return false;
 };
+
+
+const proto = Object.prototype;
+const gpo = Object.getPrototypeOf;
+const isPojo = obj => {
+  if (obj === null || typeof obj !== "object") {
+    return false;
+  }
+  return gpo(obj) === proto;
+};
+export const throwIfNotPojo = state => {
+  if (!isPojo(state)) {
+    throw new Error(
+      "ControlledReducerProvider reducer state must be a plain JavaScript Object type."
+    );
+  }
+};
