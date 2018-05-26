@@ -131,4 +131,12 @@ const XYEditor = props => (
   />
 );
 
+XYEditor.defaultProps = {
+  min: -50,
+  max: 50,
+  defaultX: 0,
+  defaultY: 0,
+  defaultLocked: false,
+};
+
 export default XYEditor;

@@ -6,7 +6,7 @@ import XYEditor from '../components/XYEditor';
 class StateProviderExamples extends React.Component {
 
   render() {
-    return (<XYEditor onStateChange={(value) => console.log(value)} />);
+    return (<XYEditor onStateChange={(value) => console.log('onStateChange', value)} />);
   }
 
 } 

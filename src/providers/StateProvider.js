@@ -12,15 +12,16 @@ const mergePropsWithState = controllableProps => (props, state) => {
   if (state === undefined) {
     return state;
   }
-  controllableProps.reduce((state, key) => {
+  
+  return controllableProps.reduce((state, key) => {
     const defaultKey = getDefaultName(key);
     if (props[key] !== undefined) {
-      assoc(key, props[key], state);
+      return assoc(key, props[key], state);
     } else if (
       props[defaultKey] !== undefined &&
-      state[defaultKey] === undefined
+      state[key] === undefined
     ) {
-      assoc(defaultKey, props[defaultKey], state);
+      return assoc(key, props[defaultKey], state);
     }
     return state;
   }, state);
@@ -29,12 +30,12 @@ const mergePropsWithState = controllableProps => (props, state) => {
 const checkForControlChange = (prevProps, nextProps) => key =>
   prevProps[key] !== undefined && nextProps[key] === undefined;
 
-const warnForControlChange = (prevProps, nextProps, state = {}, keys) => {
+const warnForControlChange = (prevProps, nextProps, state = {}) => {
   if (state[DID_WARN_FOR_CONTROL_CHANGE] === false) {
     return assoc(
       DID_WARN_FOR_CONTROL_CHANGE,
       state,
-      keys.every(checkForControlChange(nextProps, state))
+      state[CONTROLLABLE_PROPS].every(checkForControlChange(nextProps, state))
     );
   }
   return state;
@@ -48,7 +49,7 @@ export const makeControllableReducer = (controllableProps = []) => {
     let newState = reducer(mergedState, action); // reduce the state
     newState = merge(props, newState); // ovewrite controlled props
     newState = assoc(CONTROLLABLE_PROPS, controllableProps, newState); // record controllable props
-    return warnForControlChange(props, newState);
+    return newState;
   };
 };
 
@@ -98,10 +99,15 @@ class StateProvider extends React.Component {
     emitStateChange(this.props, undefined, this.state[REDUCED_STATE])();
   }
 
-  static getDerivedStateFromProps = (nextProps, prevState) =>
-    nextProps.autoMergeProps 
+  // TODO: Test for control change error
+  // TODO: Write an api tester to ensure components match what they say they will? like jest for it
+
+  static getDerivedStateFromProps = (nextProps, prevState) => {
+    warnForControlChange(this.props, nextProps, prevState);
+    return nextProps.autoMergeProps 
       ? mergePropsWithState(prevState[CONTROLLABLE_PROPS])(nextProps, prevState)
-      : null;
+      : null
+  };
 
   dispatch = action => {
     const previousState = this.state[REDUCED_STATE];
@@ -122,7 +128,7 @@ class StateProvider extends React.Component {
     const { children, defaultChildren } = this.props;
     const renderChildren = children || defaultChildren;
     return renderChildren({
-      ...(callFn(this.props.mapDispatchToActions, this.dispatch) || {}),
+      ...(callFn(this.props.mapDispatchToActions)(this.dispatch) || {}),
       ...this.props,
       ...this.state[REDUCED_STATE]
     });
