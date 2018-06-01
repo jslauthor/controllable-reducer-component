@@ -55,7 +55,7 @@ export const makeControllableReducer = (controllableProps = []) => {
 
 const isEqual = (a, b) => a !== b;
 
-const pickBy = (keys = [], state) =>
+const filterBy = (keys = [], state) =>
   keys.reduce((newState, key) => ({ [key]: state[key] }), {});
 
 const reduceState = (props, reducedState, action) => {
@@ -75,7 +75,7 @@ const emitStateChange = (
       onStateChange,
       // Only emit controlled keys so the result
       // can be {...result} back into the component
-      pickBy(newState[CONTROLLABLE_PROPS], newState)
+      filterBy(newState[CONTROLLABLE_PROPS], newState)
     );
 };
 
@@ -101,6 +101,7 @@ class StateProvider extends React.Component {
 
   // TODO: Test for control change error
   // TODO: Write an api tester to ensure components match what they say they will? like jest for it
+  // TODO: Do we need to test this against suspense, et al?
 
   static getDerivedStateFromProps = (nextProps, prevState) => {
     warnForControlChange(this.props, nextProps, prevState);

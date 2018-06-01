@@ -74,6 +74,7 @@ const reducer = (state = {}, action) => {
   }
 };
 //TODO: Need a children override example
+// TODO: Need ALL the examples :) 
 
 const defaultEditor = ({
   x,
