@@ -64,6 +64,7 @@ const reduceState = (props, reducedState, action) => {
   return reducer(reducedState, action);
 };
 
+// TODO: Emit controllstate AND all the state
 const emitStateChange = (
   { isEqual: isEqualProp, onStateChange },
   prevState,
@@ -75,7 +76,8 @@ const emitStateChange = (
       onStateChange,
       // Only emit controlled keys so the result
       // can be {...result} back into the component
-      filterBy(newState[CONTROLLABLE_PROPS], newState)
+      filterBy(newState[CONTROLLABLE_PROPS], newState),
+      newState
     );
 };
 
