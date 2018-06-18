@@ -41,8 +41,8 @@ const reducer = (state = {}, action) => {
         x: action.payload,
         ...(state.locked
           ? {
-              y: action.payload
-            }
+            y: action.payload
+          }
           : null)
       };
     }
@@ -52,8 +52,8 @@ const reducer = (state = {}, action) => {
         y: action.payload,
         ...(state.locked
           ? {
-              x: action.payload
-            }
+            x: action.payload
+          }
           : null)
       };
     }
@@ -86,46 +86,46 @@ const defaultEditor = ({
   handleXChange,
   handleYChange
 }) => (
-  <XYContainer>
-    <label>X</label>
-    <input
-      type="range"
-      value={x}
-      min={min}
-      max={max}
-      onChange={handleXChange}
-    />
-    <input value={x} onChange={handleXChange} />
+    <XYContainer>
+      <label>X</label>
+      <input
+        type="range"
+        value={x}
+        min={min}
+        max={max}
+        onChange={handleXChange}
+      />
+      <input value={x} onChange={handleXChange} />
 
-    <label>Y</label>
-    <input
-      type="range"
-      value={y}
-      min={min}
-      max={max}
-      onChange={handleYChange}
-    />
-    <input value={y} onChange={handleYChange} />
-    <div />
-    <div />
-    <button
-      style={{
-        fontSize: 20,
-        padding: 0,
-        border: 0,
-        outline: 0,
-        cursor: "pointer"
-      }}
-      onClick={toggleLocked}
-    >
-      {locked ? "🔒" : "🔓"}
-    </button>
-  </XYContainer>
-);
+      <label>Y</label>
+      <input
+        type="range"
+        value={y}
+        min={min}
+        max={max}
+        onChange={handleYChange}
+      />
+      <input value={y} onChange={handleYChange} />
+      <div />
+      <div />
+      <button
+        style={{
+          fontSize: 20,
+          padding: 0,
+          border: 0,
+          outline: 0,
+          cursor: "pointer"
+        }}
+        onClick={toggleLocked}
+      >
+        {locked ? "🔒" : "🔓"}
+      </button>
+    </XYContainer>
+  );
 
 const XYEditor = props => (
   <StateProvider
-    reducer={makeControllableReducer(["x", "y", "locked"])(reducer)}
+    reducer={makeControllableReducer(["x", "y", "locked"], reducer)}
     mapDispatchToActions={actions}
     defaultChildren={defaultEditor}
     {...props}

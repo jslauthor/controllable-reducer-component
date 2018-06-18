@@ -3,7 +3,7 @@ import { assoc, callFn } from "../utils/FunctionUtils";
 import { getDefaultName } from "../utils/StringUtils";
 import { throwIfNotPojo } from "../utils/ErrorUtils";
 
-const noop = () => {};
+const noop = () => { };
 const REDUCED_STATE = "reducedState";
 const DID_WARN_FOR_CONTROL_CHANGE = "didWarnForControlChange";
 const CONTROLLABLE_PROPS = "controllableProps";
@@ -12,7 +12,7 @@ const mergePropsWithState = controllableProps => (props, state) => {
   if (state === undefined) {
     return state;
   }
-  
+
   return controllableProps.reduce((state, key) => {
     const defaultKey = getDefaultName(key);
     if (props[key] !== undefined) {
@@ -41,9 +41,9 @@ const warnForControlChange = (prevProps, nextProps, state = {}) => {
   return state;
 };
 
-export const makeControllableReducer = (controllableProps = []) => {
+export const makeControllableReducer = (controllableProps = [], reducer = noop) => {
   const merge = mergePropsWithState(controllableProps); // merges defaults, too
-  return (reducer = noop) => (props = {}) => (state, action) => {
+  return (props = {}) => (state, action) => {
     state !== undefined && throwIfNotPojo(state);
     const mergedState = merge(props, state); // ovewrite controlled props
     let newState = reducer(mergedState, action); // reduce the state
@@ -53,10 +53,10 @@ export const makeControllableReducer = (controllableProps = []) => {
   };
 };
 
-const isEqual = (a, b) => a !== b;
+const isEqual = (a, b) => a === b;
 
 const filterBy = (keys = [], state) =>
-  keys.reduce((newState, key) => ({ [key]: state[key] }), {});
+  keys.reduce((newState, key) => ({ ...newState, [key]: state[key] }), {});
 
 const reduceState = (props, reducedState, action) => {
   const { reducer: makeReducer } = props;
@@ -71,9 +71,8 @@ const emitStateChange = (
   newState
 ) => () => {
   const isEqualFn = isEqualProp || isEqual;
-  isEqualFn(prevState, newState) &&
-    callFn(
-      onStateChange,
+  !isEqualFn(prevState, newState) &&
+    callFn(onStateChange)(
       // Only emit controlled keys so the result
       // can be {...result} back into the component
       filterBy(newState[CONTROLLABLE_PROPS], newState),
@@ -104,10 +103,13 @@ class StateProvider extends React.Component {
   // TODO: Test for control change error
   // TODO: Write an api tester to ensure components match what they say they will? like jest for it
   // TODO: Do we need to test this against suspense, et al?
+  // TODO: Add side effects?
+  // TODO: Add key to rerender https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
+  // TODO: Add EphemeralProvider
 
   static getDerivedStateFromProps = (nextProps, prevState) => {
     warnForControlChange(this.props, nextProps, prevState);
-    return nextProps.autoMergeProps 
+    return nextProps.autoMergeProps
       ? mergePropsWithState(prevState[CONTROLLABLE_PROPS])(nextProps, prevState)
       : null
   };
