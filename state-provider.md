@@ -6,13 +6,23 @@
 
 The goal is to produce sane controllable components and to avoid all the pitfalls of [reconciling props with internal state](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html).
 
-I propose a `StateProvider` component that uses a reducer to house State, implement Logic, and enable Behavior, while also defining a set of "controllable" keys that a parent may supply. 
+I propose we adopt a `StateProvider` component that uses a reducer to house State, implement Logic, and enable Behavior, while also defining a set of "controllable" keys that a parent may prescribe. 
 
 # Motivation
 
 Developer Experience for the _consumption_ of the common, reusable components is the highest priority. Only "smart" components will require `StateProvider`. 
 
 # Basic example
+
+Mental Model
+- Start with a Dumb Component, Wrap it in StateProvider
+
+```jsx
+// "Dumb" component (no internal state, logic, or behavior)
+const ToggleBase = (toggled, onToggle) => {
+
+}
+```
 
 If the proposal involves a new or changed API, include a basic code example.
 Omit this section if it's not applicable.
