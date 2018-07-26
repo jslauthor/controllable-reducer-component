@@ -47,9 +47,14 @@ export const makeControllableReducer = (controllableProps = [], reducer = noop) 
     state !== undefined && throwIfNotPojo(state);
     const mergedState = merge(props, state); // ovewrite controlled props
     let newState = reducer(mergedState, action); // reduce the state
-    newState = merge(props, newState); // ovewrite controlled props
     newState = assoc(CONTROLLABLE_PROPS, controllableProps, newState); // record controllable props
-    return newState;
+    const controlledState = merge(props, newState); // ovewrite controlled props
+    // There are two version of state at this point, and we need to mindful of both. 
+    // 1) newState doesn't include the controlled props. This is emitted to the onStateChage listener
+    // and gives the listener an opportunity to supply the new state back to the component
+    // 2) controlledState includes the "frozen" (read: controlled) props and is what the component 
+    // uses for its internal state until the parent says otherwise.
+    return { newState, controlledState };
   };
 };
 
@@ -96,7 +101,7 @@ class StateProvider extends React.Component {
     super(props);
     this.state[REDUCED_STATE] = reduceState(this.props, undefined, {
       type: "INIT"
-    });
+    }).controlledState;
     emitStateChange(this.props, undefined, this.state[REDUCED_STATE])();
   }
 
@@ -123,9 +128,9 @@ class StateProvider extends React.Component {
     );
     this.setState(
       {
-        [REDUCED_STATE]: reducedState
+        [REDUCED_STATE]: reducedState.controlledState
       },
-      emitStateChange(this.props, previousState, reducedState)
+      emitStateChange(this.props, previousState, reducedState.newState)
     );
   };
 

@@ -14,11 +14,11 @@ import PropTypes from "prop-types";
 // TODO: Consider the new context APIs as well
 // TODO: Maybe use the Reducer.Provider Reducer.Consumer syntax?
 
-const noop = () => {};
+const noop = () => { };
 
 // Call a function if it exists
 const callFn = (fn = null) => (...args) => {
-  fn ? fn(...args) : noop;
+  fn ? fn(...args) : noop();
 };
 
 class ReducerProvider extends React.Component {
